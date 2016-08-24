@@ -38,6 +38,9 @@ public class activityStart extends AppCompatActivity {
         public void onLocationChanged(Location location) {
             mLocation = location;
             Toast.makeText(context, "location update (onLocationChanged)", Toast.LENGTH_SHORT).show();
+
+            updateAddressField();
+            updateLocationText();
         }
     };
     static final long UPDATE_INTERVAL = 1000;
@@ -189,7 +192,7 @@ public class activityStart extends AppCompatActivity {
 
     static void updateLocationText() {
         if(activityStart.tvLocation != null) {
-            String locInfo = "acc: " + Float.toString(mLocation.getAccuracy()) + ", " + "lat: " + Double.toString(mLocation.getLatitude()) + ", " + "long: " + Double.toString(mLocation.getLongitude());
+            String locInfo = "Genauigkeit: " + Float.toString(mLocation.getAccuracy()) + " m\n" + "Latitude: " + Double.toString(mLocation.getLatitude()) + "\n" + "Longitude: " + Double.toString(mLocation.getLongitude());
 
             // adress
             List<android.location.Address> addresses;
@@ -198,7 +201,7 @@ public class activityStart extends AppCompatActivity {
             try {
                 addresses = geocoder.getFromLocation(mLocation.getLatitude(), mLocation.getLongitude(), 1);
 
-                locInfo += ", " + addresses.get(0).getAddressLine(0) + ", " + addresses.get(0).getPostalCode() + " " + addresses.get(0).getLocality();
+                //locInfo += ", " + addresses.get(0).getAddressLine(0) + ", " + addresses.get(0).getPostalCode() + " " + addresses.get(0).getLocality();
             } catch (IOException exc) {
                 Log.d("error", Errors.no_addresses_available.getErrorText());
             }
@@ -265,6 +268,30 @@ public class activityStart extends AppCompatActivity {
             // LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, mLocationListener);
         } catch (Exception e) {
             Log.d("error", e.getMessage());
+        }
+    }
+
+    private void startGoogleApiClient() {
+        try {
+            mGoogleApiClient.connect();
+            mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, mLocationListener);
+
+            updateLocationText();
+            updateAddressField();
+
+            Log.i("info", "google api client connected");
+        } catch (Exception e) {
+            Log.d("error", "cannot connect to google api client");
+        }
+    }
+
+    private void stopGoogleApiClient() {
+        try {
+            mGoogleApiClient.disconnect();
+            Log.i("info", "google api client disconnected");
+        } catch (Exception e) {
+            Log.d("error", "cannot disconntect form google api client");
         }
     }
 
@@ -551,13 +578,7 @@ public class activityStart extends AppCompatActivity {
     @Override
     public void onStop() {
         this.stopped = true;
-
-        try {
-            mGoogleApiClient.disconnect();
-            Log.i("info", "google api client disconnected");
-        } catch (Exception e) {
-            Log.d("error", "cannot disconntect form google api client");
-        }
+        this.stopGoogleApiClient();
 
         super.onStop();
     }
@@ -571,13 +592,7 @@ public class activityStart extends AppCompatActivity {
     @Override
     public void onPause() {
         this.paused = true;
-
-        try {
-            mGoogleApiClient.disconnect();
-            Log.i("info", "google api client disconnected");
-        } catch (Exception e) {
-            Log.d("error", "cannot disconntect form google api client");
-        }
+        this.stopGoogleApiClient();
 
         super.onPause();
     }
@@ -605,24 +620,14 @@ public class activityStart extends AppCompatActivity {
             this.start();
         }
 
-        try {
-            mGoogleApiClient.connect();
-            Log.i("info", "google api client connected");
-        } catch (Exception e) {
-            Log.d("error", "cannot connect to google api client");
-        }
+        this.startGoogleApiClient();
     }
 
     @Override
     public void onStart() {
         super.onStart();
 
-        try {
-            mGoogleApiClient.connect();
-            Log.i("info", "google api client connected");
-        } catch (Exception e) {
-            Log.d("error", "cannot connect to google api client");
-        }
+        this.startGoogleApiClient();
     }
 
     @Override
@@ -657,4 +662,5 @@ public class activityStart extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+    // endregion
 }

@@ -29,6 +29,10 @@ public class Database {
         public static final String COL_END_TOWN = "end_town";
         public static final String COL_END_ADDRESS = "end_address";
         public static final String COL_END_KMSTAND = "end_kmstand";
+
+        public static final String COL_LATITUDE = "latitude";
+        public static final String COL_LONGITUDE = "longitude";
+        public static final String COL_ORTSZUSATZ = "ortszusatz";
     }
 
     private static final String SQL_CREATE_TABLE =
