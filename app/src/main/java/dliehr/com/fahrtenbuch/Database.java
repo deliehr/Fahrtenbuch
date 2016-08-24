@@ -266,7 +266,11 @@ public class Database {
         SQLiteDatabase db = helper.getWritableDatabase();
 
         try {
+            // first delete
             db.execSQL(Database.SQL_DELETE_ENTRIES);
+
+            // recreate table
+            db.execSQL(Database.SQL_CREATE_TABLE);
             return true;
         } catch (Exception exc) {
             db.close();
