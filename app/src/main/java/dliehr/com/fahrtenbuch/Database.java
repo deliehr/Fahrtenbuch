@@ -50,7 +50,12 @@ public class Database {
                     T_FAHRT.COL_END_TIME + " TEXT, " +
                     T_FAHRT.COL_END_TOWN + " TEXT, " +
                     T_FAHRT.COL_END_ADDRESS + " TEXT, " +
-                    T_FAHRT.COL_END_KMSTAND + " TEXT)";
+                    T_FAHRT.COL_END_KMSTAND + " TEXT, " +
+                    T_FAHRT.COL_LATITUDE + " TEXT, " +
+                    T_FAHRT.COL_LONGITUDE + " TEXT, " +
+                    T_FAHRT.COL_ORTSZUSATZ + " TEXT, " +
+                    T_FAHRT.COL_PRIVATE_FAHRT + " TEXT, " +
+                    T_FAHRT.COL_CAR + " TEXT)";
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + T_FAHRT.TABLE_NAME;
@@ -115,6 +120,12 @@ public class Database {
             values.put(T_FAHRT.COL_END_TOWN, item.getEndTown());
             values.put(T_FAHRT.COL_END_ADDRESS, item.getEndAddress());
             values.put(T_FAHRT.COL_END_KMSTAND, item.getEndKmstand());
+
+            values.put(T_FAHRT.COL_LATITUDE, item.getLatitude());
+            values.put(T_FAHRT.COL_LONGITUDE, item.getLongitude());
+            values.put(T_FAHRT.COL_ORTSZUSATZ, item.getOrtszusatz());
+            values.put(T_FAHRT.COL_PRIVATE_FAHRT, item.getPrivateFahrt());
+            values.put(T_FAHRT.COL_CAR, item.getCar());
 
             return_value = db.update(T_FAHRT.TABLE_NAME, values, T_FAHRT._ID + " = " + id, null);
 
@@ -198,6 +209,12 @@ public class Database {
             values.put(T_FAHRT.COL_END_ADDRESS, item.getEndAddress());
             values.put(T_FAHRT.COL_END_KMSTAND, item.getEndKmstand());
 
+            values.put(T_FAHRT.COL_LATITUDE, item.getLatitude());
+            values.put(T_FAHRT.COL_LONGITUDE, item.getLongitude());
+            values.put(T_FAHRT.COL_ORTSZUSATZ, item.getOrtszusatz());
+            values.put(T_FAHRT.COL_PRIVATE_FAHRT, item.getPrivateFahrt());
+            values.put(T_FAHRT.COL_CAR, item.getCar());
+
             long return_value = db.insert(T_FAHRT.TABLE_NAME, T_FAHRT.TABLE_NAME, values);
 
             return return_value;
@@ -228,6 +245,7 @@ public class Database {
         }
     }
 
+    /*
     public long insertList(ArrayList<String> params) {
         FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
         SQLiteDatabase db = helper.getWritableDatabase();
@@ -241,6 +259,7 @@ public class Database {
             db.close();
         }
     }
+    */
 
     public boolean deleteEntries(String table) {
         FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
@@ -272,7 +291,12 @@ public class Database {
                     T_FAHRT.COL_END_TIME,
                     T_FAHRT.COL_END_TOWN,
                     T_FAHRT.COL_END_ADDRESS,
-                    T_FAHRT.COL_END_KMSTAND
+                    T_FAHRT.COL_END_KMSTAND,
+                    T_FAHRT.COL_LATITUDE,
+                    T_FAHRT.COL_LONGITUDE,
+                    T_FAHRT.COL_ORTSZUSATZ,
+                    T_FAHRT.COL_PRIVATE_FAHRT,
+                    T_FAHRT.COL_CAR
             }, null, null, null, null, null);
 
             try {
@@ -281,6 +305,7 @@ public class Database {
                     tmpItem.setId(c.getInt(0));
                     tmpItem.setStartFields(c.getString(1), c.getString(2), c.getString(3), c.getString(4), c.getString(5));
                     tmpItem.setEndFields(c.getString(6), c.getString(7), c.getString(8), c.getString(9), c.getString(10));
+                    tmpItem.setOtherFields(c.getString(11), c.getString(12), c.getString(13), c.getString(14), c.getString(15));
 
                     result.add(tmpItem);
                 }

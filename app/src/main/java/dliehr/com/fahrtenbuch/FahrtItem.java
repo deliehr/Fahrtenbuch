@@ -20,6 +20,12 @@ public class FahrtItem {
     private String end_address = null;
     private String end_kmstand = null;
 
+    private String latitude = null;
+    private String longitude = null;
+    private String ortszusatz = null;
+    private String private_fahrt = null;
+    private String car = null;
+
     public FahrtItem() {
 
     }
@@ -45,6 +51,14 @@ public class FahrtItem {
         this.end_town = end__town;
     }
 
+    public void setOtherFields(String lat, String longi, String ort, String priv_fahrt, String c) {
+        this.latitude = lat;
+        this.longitude = longi;
+        this.ortszusatz = ort;
+        this.private_fahrt = priv_fahrt;
+        this.car = c;
+    }
+
     public ArrayList<String> getStartFields() {
         ArrayList<String> fields = new ArrayList<String>();
         fields.add(this.start_date);
@@ -67,6 +81,17 @@ public class FahrtItem {
         return fields;
     }
 
+    public ArrayList<String> getOtherFields() {
+        ArrayList<String> fields = new ArrayList<String>();
+        fields.add(this.latitude);
+        fields.add(this.longitude);
+        fields.add(this.ortszusatz);
+        fields.add(this.private_fahrt);
+        fields.add(this.car);
+
+        return fields;
+    }
+
     public ArrayList<String> getAllFields() {
         ArrayList<String> fields = new ArrayList<String>();
 
@@ -82,6 +107,12 @@ public class FahrtItem {
         fields.add(this.end_address);
         fields.add(this.end_kmstand);
 
+        fields.add(this.latitude);
+        fields.add(this.longitude);
+        fields.add(this.ortszusatz);
+        fields.add(this.private_fahrt);
+        fields.add(this.car);
+
         return fields;
     }
 
@@ -95,4 +126,9 @@ public class FahrtItem {
     public String getEndTown() { return this.end_town; }
     public String getEndAddress() { return this.end_address; }
     public String getEndKmstand() { return this.end_kmstand; }
+    public String getLatitude() { return this.latitude; }
+    public String getLongitude() { return this.longitude; }
+    public String getOrtszusatz() { return this.ortszusatz; }
+    public String getPrivateFahrt() { return this.private_fahrt; }
+    public String getCar() { return this.car; }
 }
