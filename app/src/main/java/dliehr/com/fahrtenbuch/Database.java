@@ -35,6 +35,7 @@ public class Database {
         public static final String COL_ORTSZUSATZ = "ortszusatz";
 
         public static final String COL_PRIVATE_FAHRT = "private_fahrt";
+        public static final String COL_CAR = "car";
     }
 
     private static final String SQL_CREATE_TABLE =
