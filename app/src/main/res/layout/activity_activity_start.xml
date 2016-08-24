@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Small Text"
+        android:text=""
         android:id="@+id/tvLocationInfo"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
@@ -103,6 +103,8 @@
                 android:layout_column="1" />
         </TableRow>
 
+
+
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -131,6 +133,20 @@
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
+            <!--
+            <TextView
+                android:text="Fahrt privat:"
+                android:id="@+id/tvFahrtPrivat"
+                android:layout_column="0" />
+            -->
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Private Fahrt"
+                android:id="@+id/checkBox"
+                android:layout_column="1" />
 
         </TableRow>
     </TableLayout>

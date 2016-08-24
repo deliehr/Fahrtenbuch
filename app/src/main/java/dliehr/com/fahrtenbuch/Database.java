@@ -33,6 +33,8 @@ public class Database {
         public static final String COL_LATITUDE = "latitude";
         public static final String COL_LONGITUDE = "longitude";
         public static final String COL_ORTSZUSATZ = "ortszusatz";
+
+        public static final String COL_PRIVATE_FAHRT = "private_fahrt";
     }
 
     private static final String SQL_CREATE_TABLE =
