@@ -39,6 +39,8 @@ public class activityStart extends AppCompatActivity {
             mLocation = location;
             Toast.makeText(context, "location update (onLocationChanged)", Toast.LENGTH_SHORT).show();
 
+            Log.i("info", "location changed");
+
             updateAddressField();
             updateLocationText();
         }
@@ -632,9 +634,6 @@ public class activityStart extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
-
-
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
 
