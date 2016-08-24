@@ -151,16 +151,20 @@ public class activityStart extends AppCompatActivity {
         Geocoder geocoder = null;
 
         try {
-            geocoder = new Geocoder(activityStart.context, Locale.getDefault());
-            addresses = geocoder.getFromLocation(mLocation.getLatitude(), mLocation.getLongitude(), 1);
+            if(mLocation != null) {
+                geocoder = new Geocoder(context, Locale.getDefault());
+                addresses = geocoder.getFromLocation(mLocation.getLatitude(), mLocation.getLongitude(), 1);
 
-            addressInfo += addresses.get(0).getPostalCode() + " " + addresses.get(0).getLocality() + ", " + addresses.get(0).getAddressLine(0);
+                addressInfo += addresses.get(0).getPostalCode() + " " + addresses.get(0).getLocality() + ", " + addresses.get(0).getAddressLine(0);
 
-            activityStart.etAdressField.setText(addressInfo);
-
-            //Log.i("info", "setting text etadressfield = " + addressInfo);
+                activityStart.etAdressField.setText(addressInfo);
+            } else {
+                Log.d("error", "location null");
+            }
         } catch (IOException exc) {
-            Log.d("error", Errors.no_addresses_available.getErrorText());
+            Log.d("error", Errors.no_addresses_available.getErrorText() + ": " + exc.getMessage());
+        } catch (Exception exc) {
+            Log.d("error", exc.getMessage());
         }
     }
 
@@ -317,7 +321,7 @@ public class activityStart extends AppCompatActivity {
         String kmstand = ((EditText) findViewById(R.id.etKmStand)).getText().toString();
 
         if(!kmstand.matches("")) {
-            if(Integer.valueOf(kmstand) >= this.lastKmstand) {
+            if(Double.valueOf(kmstand) >= this.lastKmstand) {
                 // check if table exists
                 if(!Database.getInstance(this).checkIfTableExists(Database.T_FAHRT.TABLE_NAME)) {
                     // create table first
@@ -353,7 +357,15 @@ public class activityStart extends AppCompatActivity {
                     Log.d("error", Errors.no_addresses_available.getErrorText());
                 }
 
-                tmpItem.setStartFields(currentDate.format(new Date()), currentTime.format(new Date()), town, address, Double.valueOf(kmstand));
+                try {
+                    String ortszusatz = ((EditText) findViewById(R.id.etOrtszusatz)).getText().toString();
+                    Boolean privateFahrt = ((CheckBox) findViewById(R.id.cbPrivateFahrt)).isChecked();
+                    String car = ((EditText) findViewById(R.id.etCar)).getText().toString();
+
+                    tmpItem.setStartFields(currentDate.format(new Date()), currentTime.format(new Date()), town, address, Double.valueOf(kmstand), mLocation.getLatitude(), mLocation.getLongitude(), ortszusatz, privateFahrt, car);
+                } catch (Exception exc) {
+                    Log.d("error", exc.getMessage());
+                }
 
                 long returnNumber = -1;
 
@@ -381,7 +393,7 @@ public class activityStart extends AppCompatActivity {
         String kmstand = ((EditText) findViewById(R.id.etKmStand)).getText().toString();
 
         if(!kmstand.matches("")) {
-            if(Integer.valueOf(kmstand) >= this.lastKmstand) {
+            if(Double.valueOf(kmstand) >= this.lastKmstand) {
                 // check last row incomplete
                 List<FahrtItem> resultItems = Database.getInstance(this).getAll();
 
@@ -416,9 +428,14 @@ public class activityStart extends AppCompatActivity {
                     Log.d("error", Errors.no_addresses_available.getErrorText());
                 }
 
+                String ortszusatz = ((EditText) findViewById(R.id.etOrtszusatz)).getText().toString();
+                Boolean privateFahrt = ((CheckBox) findViewById(R.id.cbPrivateFahrt)).isChecked();
+                String car = ((EditText) findViewById(R.id.etCar)).getText().toString();
+
                 try {
                     // update item and db
-                    lastDriveItem.setEndFields(currentDate.format(new Date()), currentTime.format(new Date()), town, address, Double.valueOf(kmstand));
+                    //lastDriveItem.setEndFields(currentDate.format(new Date()), currentTime.format(new Date()), town, address, Double.valueOf(kmstand));
+                    lastDriveItem.setEndFields(currentDate.format(new Date()), currentTime.format(new Date()), town, address, Double.valueOf(kmstand), mLocation.getLatitude(), mLocation.getLongitude(), ortszusatz, privateFahrt, car);
                     long returnId = Database.getInstance(this).updateRowWithId(lastDriveItem.getId(), lastDriveItem);
                     Toast.makeText(activityStart.this, "Fahrt beendet ...", Toast.LENGTH_SHORT).show();
 

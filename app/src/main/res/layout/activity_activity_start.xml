@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/etDatumUhrzeit"
                 android:layout_column="1"
-                android:inputType="textNoSuggestions"/>
+                android:inputType="textNoSuggestions|textMultiLine"/>
         </TableRow>
 
         <TableRow
@@ -163,7 +163,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Private Fahrt"
-                android:id="@+id/checkBox"
+                android:id="@+id/cbPrivateFahrt"
                 android:layout_column="1" />
 
         </TableRow>

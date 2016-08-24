@@ -23,19 +23,22 @@ public class Database {
         public static final String COL_START_TOWN = "start_town";   // text 3
         public static final String COL_START_ADDRESS = "start_address"; //text  4
         public static final String COL_START_KMSTAND = "start_kmstand"; // real 5
+        public static final String COL_START_LATITUDE = "start_latitude";   // real 6
+        public static final String COL_START_LONGITUDE = "start_longitude"; // real 7
+        public static final String COL_START_ORTSZUSATZ = "start_ortszusatz";   // text 8
+        public static final String COL_START_PRIVATE_FAHRT = "start_private_fahrt"; // integer  9
+        public static final String COL_START_CAR = "start_car"; // text 10
 
-        public static final String COL_END_DATE = "end_date";   // text 6
-        public static final String COL_END_TIME = "end_time";   // text 7
-        public static final String COL_END_TOWN = "end_town";   // text 8
-        public static final String COL_END_ADDRESS = "end_address"; // text 9
-        public static final String COL_END_KMSTAND = "end_kmstand"; // real 10
-
-        public static final String COL_LATITUDE = "latitude";   // real 11
-        public static final String COL_LONGITUDE = "longitude"; // real 12
-        public static final String COL_ORTSZUSATZ = "ortszusatz";   // text 13
-
-        public static final String COL_PRIVATE_FAHRT = "private_fahrt"; // integer  14
-        public static final String COL_CAR = "car"; // text 15
+        public static final String COL_END_DATE = "end_date";   // text 11
+        public static final String COL_END_TIME = "end_time";   // text 12
+        public static final String COL_END_TOWN = "end_town";   // text 13
+        public static final String COL_END_ADDRESS = "end_address"; // text 14
+        public static final String COL_END_KMSTAND = "end_kmstand"; // real 15
+        public static final String COL_END_LATITUDE = "end_latitude";   // real 16
+        public static final String COL_END_LONGITUDE = "end_longitude"; // real 17
+        public static final String COL_END_ORTSZUSATZ = "end_ortszusatz";   // text 18
+        public static final String COL_END_PRIVATE_FAHRT = "end_private_fahrt"; // integer  19
+        public static final String COL_END_CAR = "end_car"; // text 20
     }
 
     private static final String SQL_CREATE_TABLE =
@@ -46,16 +49,22 @@ public class Database {
                     T_FAHRT.COL_START_TOWN + " TEXT, " +
                     T_FAHRT.COL_START_ADDRESS + " TEXT, " +
                     T_FAHRT.COL_START_KMSTAND + " REAL, " +
+                    T_FAHRT.COL_START_LATITUDE + " REAL, " +
+                    T_FAHRT.COL_START_LONGITUDE + " REAL, " +
+                    T_FAHRT.COL_START_ORTSZUSATZ + " TEXT, " +
+                    T_FAHRT.COL_START_PRIVATE_FAHRT + " INTEGER, " +
+                    T_FAHRT.COL_START_CAR + " TEXT, " +
+
                     T_FAHRT.COL_END_DATE + " TEXT, " +
                     T_FAHRT.COL_END_TIME + " TEXT, " +
                     T_FAHRT.COL_END_TOWN + " TEXT, " +
                     T_FAHRT.COL_END_ADDRESS + " TEXT, " +
                     T_FAHRT.COL_END_KMSTAND + " REAL, " +
-                    T_FAHRT.COL_LATITUDE + " REAL, " +
-                    T_FAHRT.COL_LONGITUDE + " REAL, " +
-                    T_FAHRT.COL_ORTSZUSATZ + " TEXT, " +
-                    T_FAHRT.COL_PRIVATE_FAHRT + " INTEGER, " +
-                    T_FAHRT.COL_CAR + " TEXT)";
+                    T_FAHRT.COL_END_LATITUDE + " REAL, " +
+                    T_FAHRT.COL_END_LONGITUDE + " REAL, " +
+                    T_FAHRT.COL_END_ORTSZUSATZ + " TEXT, " +
+                    T_FAHRT.COL_END_PRIVATE_FAHRT + " INTEGER, " +
+                    T_FAHRT.COL_END_CAR + " TEXT)";
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + T_FAHRT.TABLE_NAME;
@@ -114,18 +123,22 @@ public class Database {
             values.put(T_FAHRT.COL_START_TOWN, item.getStartTown());
             values.put(T_FAHRT.COL_START_ADDRESS, item.getStartAddress());
             values.put(T_FAHRT.COL_START_KMSTAND, item.getStartKmstand());
+            values.put(T_FAHRT.COL_START_LATITUDE, item.getStartLatitude());
+            values.put(T_FAHRT.COL_START_LONGITUDE, item.getStartLongitude());
+            values.put(T_FAHRT.COL_START_ORTSZUSATZ, item.getStartOrtszusatz());
+            values.put(T_FAHRT.COL_START_PRIVATE_FAHRT, item.getStartPrivateFahrt());
+            values.put(T_FAHRT.COL_START_CAR, item.getStartCar());
 
             values.put(T_FAHRT.COL_END_DATE, item.getEndDate());
             values.put(T_FAHRT.COL_END_TIME, item.getEndTime());
             values.put(T_FAHRT.COL_END_TOWN, item.getEndTown());
             values.put(T_FAHRT.COL_END_ADDRESS, item.getEndAddress());
             values.put(T_FAHRT.COL_END_KMSTAND, item.getEndKmstand());
-
-            values.put(T_FAHRT.COL_LATITUDE, item.getLatitude());
-            values.put(T_FAHRT.COL_LONGITUDE, item.getLongitude());
-            values.put(T_FAHRT.COL_ORTSZUSATZ, item.getOrtszusatz());
-            values.put(T_FAHRT.COL_PRIVATE_FAHRT, item.getPrivateFahrt());
-            values.put(T_FAHRT.COL_CAR, item.getCar());
+            values.put(T_FAHRT.COL_END_LATITUDE, item.getEndLatitude());
+            values.put(T_FAHRT.COL_END_LONGITUDE, item.getEndLongitude());
+            values.put(T_FAHRT.COL_END_ORTSZUSATZ, item.getEndOrtszusatz());
+            values.put(T_FAHRT.COL_END_PRIVATE_FAHRT, item.getEndPrivateFahrt());
+            values.put(T_FAHRT.COL_END_CAR, item.getEndCar());
 
             return_value = db.update(T_FAHRT.TABLE_NAME, values, T_FAHRT._ID + " = " + id, null);
 
@@ -202,18 +215,22 @@ public class Database {
             values.put(T_FAHRT.COL_START_TOWN, item.getStartTown());
             values.put(T_FAHRT.COL_START_ADDRESS, item.getStartAddress());
             values.put(T_FAHRT.COL_START_KMSTAND, item.getStartKmstand());
+            values.put(T_FAHRT.COL_START_LATITUDE, item.getStartLatitude());
+            values.put(T_FAHRT.COL_START_LONGITUDE, item.getStartLongitude());
+            values.put(T_FAHRT.COL_START_ORTSZUSATZ, item.getStartOrtszusatz());
+            values.put(T_FAHRT.COL_START_PRIVATE_FAHRT, item.getStartPrivateFahrt());
+            values.put(T_FAHRT.COL_START_CAR, item.getStartCar());
 
             values.put(T_FAHRT.COL_END_DATE, item.getEndDate());
             values.put(T_FAHRT.COL_END_TIME, item.getEndTime());
             values.put(T_FAHRT.COL_END_TOWN, item.getEndTown());
             values.put(T_FAHRT.COL_END_ADDRESS, item.getEndAddress());
             values.put(T_FAHRT.COL_END_KMSTAND, item.getEndKmstand());
-
-            values.put(T_FAHRT.COL_LATITUDE, item.getLatitude());
-            values.put(T_FAHRT.COL_LONGITUDE, item.getLongitude());
-            values.put(T_FAHRT.COL_ORTSZUSATZ, item.getOrtszusatz());
-            values.put(T_FAHRT.COL_PRIVATE_FAHRT, item.getPrivateFahrt());
-            values.put(T_FAHRT.COL_CAR, item.getCar());
+            values.put(T_FAHRT.COL_END_LATITUDE, item.getEndLatitude());
+            values.put(T_FAHRT.COL_END_LONGITUDE, item.getEndLongitude());
+            values.put(T_FAHRT.COL_END_ORTSZUSATZ, item.getEndOrtszusatz());
+            values.put(T_FAHRT.COL_END_PRIVATE_FAHRT, item.getEndPrivateFahrt());
+            values.put(T_FAHRT.COL_END_CAR, item.getEndCar());
 
             long return_value = db.insert(T_FAHRT.TABLE_NAME, T_FAHRT.TABLE_NAME, values);
 
@@ -291,25 +308,38 @@ public class Database {
                     T_FAHRT.COL_START_TOWN,
                     T_FAHRT.COL_START_ADDRESS,
                     T_FAHRT.COL_START_KMSTAND,
+                    T_FAHRT.COL_START_LATITUDE,
+                    T_FAHRT.COL_START_LONGITUDE,
+                    T_FAHRT.COL_START_ORTSZUSATZ,
+                    T_FAHRT.COL_START_PRIVATE_FAHRT,
+                    T_FAHRT.COL_START_CAR,
                     T_FAHRT.COL_END_DATE,
                     T_FAHRT.COL_END_TIME,
                     T_FAHRT.COL_END_TOWN,
                     T_FAHRT.COL_END_ADDRESS,
                     T_FAHRT.COL_END_KMSTAND,
-                    T_FAHRT.COL_LATITUDE,
-                    T_FAHRT.COL_LONGITUDE,
-                    T_FAHRT.COL_ORTSZUSATZ,
-                    T_FAHRT.COL_PRIVATE_FAHRT,
-                    T_FAHRT.COL_CAR
+                    T_FAHRT.COL_END_LATITUDE,
+                    T_FAHRT.COL_END_LONGITUDE,
+                    T_FAHRT.COL_END_ORTSZUSATZ,
+                    T_FAHRT.COL_END_PRIVATE_FAHRT,
+                    T_FAHRT.COL_END_CAR
             }, null, null, null, null, null);
 
             try {
                 while(c.moveToNext()) {
                     FahrtItem tmpItem = new FahrtItem();
+
+                    // first field
                     tmpItem.setId(c.getInt(0));
-                    tmpItem.setStartFields(c.getString(1), c.getString(2), c.getString(3), c.getString(4), c.getDouble(5));
-                    tmpItem.setEndFields(c.getString(6), c.getString(7), c.getString(8), c.getString(9), c.getDouble(10));
-                    tmpItem.setOtherFields(c.getDouble(11), c.getDouble(12), c.getString(13), (c.getInt(14) != 0), c.getString(15));
+
+                    // start fields
+                    tmpItem.setStartFields(c.getString(1), c.getString(2), c.getString(3), c.getString(4), c.getDouble(5), c.getDouble(6), c.getDouble(7), c.getString(8), (c.getInt(9) != 0), c.getString(10));
+
+                    // end fields
+                    tmpItem.setEndFields(c.getString(11), c.getString(12), c.getString(13), c.getString(14), c.getDouble(15), c.getDouble(16), c.getDouble(17), c.getString(18), (c.getInt(19) != 0), c.getString(20));
+
+                    //tmpItem.setStartFields(c.getString(1), c.getString(2), c.getString(3), c.getString(4), c.getDouble(5));
+                    //tmpItem.setEndFields(c.getString(6), c.getString(7), c.getString(8), c.getString(9), c.getDouble(10));
 
                     result.add(tmpItem);
                 }
