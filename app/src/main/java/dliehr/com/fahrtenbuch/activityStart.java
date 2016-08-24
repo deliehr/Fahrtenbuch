@@ -100,7 +100,7 @@ public class activityStart extends AppCompatActivity {
 
     private void start() {
         startCheckingActiveDrive();
-        startGetLastKmstand();
+        startGetLastData();
         //startEnableBluetoothConnection();
     }
 
@@ -192,7 +192,7 @@ public class activityStart extends AppCompatActivity {
 
     // region handle location services
 
-    private void startGetLastKmstand() {
+    private void startGetLastData() {
         try {
             // check for existing active drive
             List<FahrtItem> resultItems = Database.getInstance(this).getAll();
@@ -210,11 +210,28 @@ public class activityStart extends AppCompatActivity {
                 FahrtItem lastFahrtItem = resultItems.get(maxIndex);
 
                 if(lastFahrtItem != null) {
+                    // last kmstand
                     if(lastFahrtItem.getEndKmstand() != null) {
                         ((EditText) findViewById(R.id.etKmStand)).setText(String.valueOf(lastFahrtItem.getEndKmstand()));
                     } else {
                         // try start km stand
-                        ((EditText) findViewById(R.id.etKmStand)).setText(String.valueOf(lastFahrtItem.getStartKmstand()));
+                        if(lastFahrtItem.getStartKmstand() != null) {
+                            ((EditText) findViewById(R.id.etKmStand)).setText(String.valueOf(lastFahrtItem.getStartKmstand()));
+                        } else {
+                            //
+                        }
+                    }
+
+                    // last car
+                    if(lastFahrtItem.getEndCar() != null) {
+                        ((EditText) findViewById(R.id.etCar)).setText(String.valueOf(lastFahrtItem.getEndCar()));
+                    }else {
+                        // try start car
+                        if(lastFahrtItem.getStartCar() != null) {
+                            ((EditText) findViewById(R.id.etCar)).setText(String.valueOf(lastFahrtItem.getStartCar()));
+                        } else {
+                            //
+                        }
                     }
                 } else {
                     // not possible to determine
