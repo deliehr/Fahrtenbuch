@@ -57,7 +57,7 @@ public class activityStart extends AppCompatActivity {
     // drive
     boolean driveStarted = false;
     boolean driveEnded = false;
-    int lastKmstand = -1;
+    double lastKmstand = -1.0;
 
     // bluetooth
     static BluetoothAdapter bluetoothAdapter = null;
@@ -69,11 +69,7 @@ public class activityStart extends AppCompatActivity {
     static boolean runningLocationThread = true;
     static Context context = null;
 
-    private void start() {
-        startCheckingActiveDrive();
-        startGetLastKmstand();
-        //startEnableBluetoothConnection();
-    }
+    // region handle bluetooth
 
     static void startEnableBluetoothConnection() {
         try {
@@ -98,39 +94,14 @@ public class activityStart extends AppCompatActivity {
         }
     }
 
-    private void startGetLastKmstand() {
-        try {
-            // check for existing active drive
-            List<FahrtItem> resultItems = Database.getInstance(this).getAll();
+    // endregion
 
-            // get last item
-            int maxIndex = -1;
-            for(int i = 0;i < resultItems.size();i += 1) {
-                if(resultItems.get(i).getId() >= maxIndex) {
-                    maxIndex = i;
-                }
-            }
+    // region helper methods
 
-            if(maxIndex >= 0) {
-                //maxIndex = resultItems.get(maxIndex).getId();   // überflüssig ?
-                FahrtItem lastFahrtItem = resultItems.get(maxIndex);
-
-                if(lastFahrtItem != null) {
-                    if(lastFahrtItem.getEndKmstand() != null) {
-                        ((EditText) findViewById(R.id.etKmStand)).setText(lastFahrtItem.getEndKmstand());
-                    } else {
-                        // try start km stand
-                        ((EditText) findViewById(R.id.etKmStand)).setText(lastFahrtItem.getStartKmstand());
-                    }
-                } else {
-                    // not possible to determine
-                }
-            } else {
-                Log.d("warning", Errors.could_not_load_last_drive.getErrorText());
-            }
-        } catch (Exception exc) {
-            Log.d("error", "error: " + exc.getMessage());
-        }
+    private void start() {
+        startCheckingActiveDrive();
+        startGetLastKmstand();
+        //startEnableBluetoothConnection();
     }
 
     private void startCheckingActiveDrive() {
@@ -160,7 +131,8 @@ public class activityStart extends AppCompatActivity {
                 ((Button) findViewById(R.id.btnEndDrive)).setEnabled(true);
 
                 // last km
-                this.lastKmstand = Integer.valueOf(lastFahrtItem.getStartKmstand());
+                //this.lastKmstand = Integer.valueOf(lastFahrtItem.getStartKmstand());
+                this.lastKmstand = lastFahrtItem.getStartKmstand();
                 ((EditText) findViewById(R.id.etKmStand)).setText(String.valueOf(this.lastKmstand));
             } else {
                 // no last drive existing
@@ -209,6 +181,45 @@ public class activityStart extends AppCompatActivity {
             }
 
             activityStart.tvLocation.setText(locInfo);
+        }
+    }
+
+    // endregion
+
+    // region handle location services
+
+    private void startGetLastKmstand() {
+        try {
+            // check for existing active drive
+            List<FahrtItem> resultItems = Database.getInstance(this).getAll();
+
+            // get last item
+            int maxIndex = -1;
+            for(int i = 0;i < resultItems.size();i += 1) {
+                if(resultItems.get(i).getId() >= maxIndex) {
+                    maxIndex = i;
+                }
+            }
+
+            if(maxIndex >= 0) {
+                //maxIndex = resultItems.get(maxIndex).getId();   // überflüssig ?
+                FahrtItem lastFahrtItem = resultItems.get(maxIndex);
+
+                if(lastFahrtItem != null) {
+                    if(lastFahrtItem.getEndKmstand() != null) {
+                        ((EditText) findViewById(R.id.etKmStand)).setText(String.valueOf(lastFahrtItem.getEndKmstand()));
+                    } else {
+                        // try start km stand
+                        ((EditText) findViewById(R.id.etKmStand)).setText(String.valueOf(lastFahrtItem.getStartKmstand()));
+                    }
+                } else {
+                    // not possible to determine
+                }
+            } else {
+                Log.d("warning", Errors.could_not_load_last_drive.getErrorText());
+            }
+        } catch (Exception exc) {
+            Log.d("error", "error: " + exc.getMessage());
         }
     }
 
@@ -297,6 +308,8 @@ public class activityStart extends AppCompatActivity {
         }
     }
 
+    // endregion
+
     // region button event methods
     public void btnClickStartDrive(View view) {
         // start drive
@@ -340,7 +353,7 @@ public class activityStart extends AppCompatActivity {
                     Log.d("error", Errors.no_addresses_available.getErrorText());
                 }
 
-                tmpItem.setStartFields(currentDate.format(new Date()), currentTime.format(new Date()), town, address, kmstand);
+                tmpItem.setStartFields(currentDate.format(new Date()), currentTime.format(new Date()), town, address, Double.valueOf(kmstand));
 
                 long returnNumber = -1;
 
@@ -405,7 +418,7 @@ public class activityStart extends AppCompatActivity {
 
                 try {
                     // update item and db
-                    lastDriveItem.setEndFields(currentDate.format(new Date()), currentTime.format(new Date()), town, address, kmstand);
+                    lastDriveItem.setEndFields(currentDate.format(new Date()), currentTime.format(new Date()), town, address, Double.valueOf(kmstand));
                     long returnId = Database.getInstance(this).updateRowWithId(lastDriveItem.getId(), lastDriveItem);
                     Toast.makeText(activityStart.this, "Fahrt beendet ...", Toast.LENGTH_SHORT).show();
 

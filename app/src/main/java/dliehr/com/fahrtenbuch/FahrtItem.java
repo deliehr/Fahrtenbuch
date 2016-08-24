@@ -12,18 +12,18 @@ public class FahrtItem {
     private String start_time = null;
     private String start_town = null;
     private String start_address = null;
-    private String start_kmstand = null;
+    private Double start_kmstand = null;
 
     private String end_date = null;
     private String end_time = null;
     private String end_town = null;
     private String end_address = null;
-    private String end_kmstand = null;
+    private Double end_kmstand = null;
 
-    private String latitude = null;
-    private String longitude = null;
+    private Double latitude = null;
+    private Double longitude = null;
     private String ortszusatz = null;
-    private String private_fahrt = null;
+    private Boolean private_fahrt = null;
     private String car = null;
 
     public FahrtItem() {
@@ -33,9 +33,10 @@ public class FahrtItem {
     public int getId() {
         return this.id;
     }
+
     public void setId(int id) { this.id = id;}
 
-    public void setStartFields(String start__date, String start__time, String start__town, String start__address, String start__kmstand) {
+    public void setStartFields(String start__date, String start__time, String start__town, String start__address, Double start__kmstand) {
         this.start_address = start__address;
         this.start_date = start__date;
         this.start_kmstand = start__kmstand;
@@ -43,7 +44,7 @@ public class FahrtItem {
         this.start_town = start__town;
     }
 
-    public void setEndFields(String end__date, String end__time, String end__town, String end__address, String end__kmstand) {
+    public void setEndFields(String end__date, String end__time, String end__town, String end__address, Double end__kmstand) {
         this.end_address = end__address;
         this.end_date = end__time;
         this.end_kmstand = end__kmstand;
@@ -51,7 +52,7 @@ public class FahrtItem {
         this.end_town = end__town;
     }
 
-    public void setOtherFields(String lat, String longi, String ort, String priv_fahrt, String c) {
+    public void setOtherFields(Double lat, Double longi, String ort, Boolean priv_fahrt, String c) {
         this.latitude = lat;
         this.longitude = longi;
         this.ortszusatz = ort;
@@ -59,19 +60,19 @@ public class FahrtItem {
         this.car = c;
     }
 
-    public ArrayList<String> getStartFields() {
-        ArrayList<String> fields = new ArrayList<String>();
-        fields.add(this.start_date);
-        fields.add(this.start_time);
-        fields.add(this.start_town);
-        fields.add(this.start_address);
-        fields.add(this.start_kmstand);
+    public ArrayList<Object> getStartFields() {
+        ArrayList<Object> fields = new ArrayList<Object>();
+        fields.add(this.start_date);    // text 1
+        fields.add(this.start_time);    // text 2
+        fields.add(this.start_town);    // text 3
+        fields.add(this.start_address); // text 4
+        fields.add(this.start_kmstand); // real 5
 
         return fields;
     }
 
-    public ArrayList<String> getEndFields() {
-        ArrayList<String> fields = new ArrayList<String>();
+    public ArrayList<Object> getEndFields() {
+        ArrayList<Object> fields = new ArrayList<Object>();
         fields.add(this.end_date);
         fields.add(this.end_time);
         fields.add(this.end_town);
@@ -81,8 +82,8 @@ public class FahrtItem {
         return fields;
     }
 
-    public ArrayList<String> getOtherFields() {
-        ArrayList<String> fields = new ArrayList<String>();
+    public ArrayList<Object> getOtherFields() {
+        ArrayList<Object> fields = new ArrayList<Object>();
         fields.add(this.latitude);
         fields.add(this.longitude);
         fields.add(this.ortszusatz);
@@ -92,8 +93,8 @@ public class FahrtItem {
         return fields;
     }
 
-    public ArrayList<String> getAllFields() {
-        ArrayList<String> fields = new ArrayList<String>();
+    public ArrayList<Object> getAllFields() {
+        ArrayList<Object> fields = new ArrayList<Object>();
 
         fields.add(this.start_date);
         fields.add(this.start_time);
@@ -120,15 +121,15 @@ public class FahrtItem {
     public String getStartTime() { return this.start_time; }
     public String getStartTown() { return this.start_town; }
     public String getStartAddress() { return this.start_address; }
-    public String getStartKmstand() { return this.start_kmstand; }
+    public Double getStartKmstand() { return this.start_kmstand; }
     public String getEndDate() { return this.end_date; }
     public String getEndTime() { return this.end_time; }
     public String getEndTown() { return this.end_town; }
     public String getEndAddress() { return this.end_address; }
-    public String getEndKmstand() { return this.end_kmstand; }
-    public String getLatitude() { return this.latitude; }
-    public String getLongitude() { return this.longitude; }
+    public Double getEndKmstand() { return this.end_kmstand; }
+    public Double getLatitude() { return this.latitude; }
+    public Double getLongitude() { return this.longitude; }
     public String getOrtszusatz() { return this.ortszusatz; }
-    public String getPrivateFahrt() { return this.private_fahrt; }
+    public Boolean getPrivateFahrt() { return this.private_fahrt; }
     public String getCar() { return this.car; }
 }

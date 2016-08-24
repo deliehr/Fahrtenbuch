@@ -16,26 +16,26 @@ import java.util.List;
 
 public class Database {
     public static abstract class T_FAHRT implements BaseColumns {
-        public static final String TABLE_NAME = "T_FAHRT";
+        public static final String TABLE_NAME = "T_FAHRT";  // int  0
 
-        public static final String COL_START_DATE = "start_date";
-        public static final String COL_START_TIME = "start_time";
-        public static final String COL_START_TOWN = "start_town";
-        public static final String COL_START_ADDRESS = "start_address";
-        public static final String COL_START_KMSTAND = "start_kmstand";
+        public static final String COL_START_DATE = "start_date";   // text 1
+        public static final String COL_START_TIME = "start_time";   // text 2
+        public static final String COL_START_TOWN = "start_town";   // text 3
+        public static final String COL_START_ADDRESS = "start_address"; //text  4
+        public static final String COL_START_KMSTAND = "start_kmstand"; // real 5
 
-        public static final String COL_END_DATE = "end_date";
-        public static final String COL_END_TIME = "end_time";
-        public static final String COL_END_TOWN = "end_town";
-        public static final String COL_END_ADDRESS = "end_address";
-        public static final String COL_END_KMSTAND = "end_kmstand";
+        public static final String COL_END_DATE = "end_date";   // text 6
+        public static final String COL_END_TIME = "end_time";   // text 7
+        public static final String COL_END_TOWN = "end_town";   // text 8
+        public static final String COL_END_ADDRESS = "end_address"; // text 9
+        public static final String COL_END_KMSTAND = "end_kmstand"; // real 10
 
-        public static final String COL_LATITUDE = "latitude";
-        public static final String COL_LONGITUDE = "longitude";
-        public static final String COL_ORTSZUSATZ = "ortszusatz";
+        public static final String COL_LATITUDE = "latitude";   // real 11
+        public static final String COL_LONGITUDE = "longitude"; // real 12
+        public static final String COL_ORTSZUSATZ = "ortszusatz";   // text 13
 
-        public static final String COL_PRIVATE_FAHRT = "private_fahrt";
-        public static final String COL_CAR = "car";
+        public static final String COL_PRIVATE_FAHRT = "private_fahrt"; // integer  14
+        public static final String COL_CAR = "car"; // text 15
     }
 
     private static final String SQL_CREATE_TABLE =
@@ -45,16 +45,16 @@ public class Database {
                     T_FAHRT.COL_START_TIME + " TEXT, " +
                     T_FAHRT.COL_START_TOWN + " TEXT, " +
                     T_FAHRT.COL_START_ADDRESS + " TEXT, " +
-                    T_FAHRT.COL_START_KMSTAND + " TEXT, " +
+                    T_FAHRT.COL_START_KMSTAND + " REAL, " +
                     T_FAHRT.COL_END_DATE + " TEXT, " +
                     T_FAHRT.COL_END_TIME + " TEXT, " +
                     T_FAHRT.COL_END_TOWN + " TEXT, " +
                     T_FAHRT.COL_END_ADDRESS + " TEXT, " +
-                    T_FAHRT.COL_END_KMSTAND + " TEXT, " +
-                    T_FAHRT.COL_LATITUDE + " TEXT, " +
-                    T_FAHRT.COL_LONGITUDE + " TEXT, " +
+                    T_FAHRT.COL_END_KMSTAND + " REAL, " +
+                    T_FAHRT.COL_LATITUDE + " REAL, " +
+                    T_FAHRT.COL_LONGITUDE + " REAL, " +
                     T_FAHRT.COL_ORTSZUSATZ + " TEXT, " +
-                    T_FAHRT.COL_PRIVATE_FAHRT + " TEXT, " +
+                    T_FAHRT.COL_PRIVATE_FAHRT + " INTEGER, " +
                     T_FAHRT.COL_CAR + " TEXT)";
 
     private static final String SQL_DELETE_ENTRIES =
@@ -303,9 +303,9 @@ public class Database {
                 while(c.moveToNext()) {
                     FahrtItem tmpItem = new FahrtItem();
                     tmpItem.setId(c.getInt(0));
-                    tmpItem.setStartFields(c.getString(1), c.getString(2), c.getString(3), c.getString(4), c.getString(5));
-                    tmpItem.setEndFields(c.getString(6), c.getString(7), c.getString(8), c.getString(9), c.getString(10));
-                    tmpItem.setOtherFields(c.getString(11), c.getString(12), c.getString(13), c.getString(14), c.getString(15));
+                    tmpItem.setStartFields(c.getString(1), c.getString(2), c.getString(3), c.getString(4), c.getDouble(5));
+                    tmpItem.setEndFields(c.getString(6), c.getString(7), c.getString(8), c.getString(9), c.getDouble(10));
+                    tmpItem.setOtherFields(c.getDouble(11), c.getDouble(12), c.getString(13), (c.getInt(14) != 0), c.getString(15));
 
                     result.add(tmpItem);
                 }
