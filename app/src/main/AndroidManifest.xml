@@ -16,7 +16,10 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activityStart"
+
+        <activity
+            android:name=".activityStart"
+            android:label="Start"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,8 +27,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activityGps" />
-        <activity android:name=".activityDatabase"></activity>
+
+        <activity
+            android:name=".activityGps"
+            android:label="GPS / Bluetooth" />
+
+        <activity
+            android:name=".activityDatabase"
+            android:label="Datenbank" />
+
+        <activity
+            android:name=".activityConfig"
+            android:label="Einstellungen"></activity>
     </application>
 
 </manifest>

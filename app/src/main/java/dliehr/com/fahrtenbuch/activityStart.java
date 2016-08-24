@@ -184,7 +184,7 @@ public class activityStart extends AppCompatActivity {
 
             activityStart.etAdressField.setText(addressInfo);
 
-            Log.i("info", "setting text etadressfield = " + addressInfo);
+            //Log.i("info", "setting text etadressfield = " + addressInfo);
         } catch (IOException exc) {
             Log.d("error", Errors.no_addresses_available.getErrorText());
         }
@@ -632,6 +632,9 @@ public class activityStart extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
+
+
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
 

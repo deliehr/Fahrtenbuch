@@ -50,7 +50,8 @@
                 android:layout_width="150px"
                 android:layout_height="wrap_content"
                 android:id="@+id/etDatumUhrzeit"
-                android:layout_column="1" />
+                android:layout_column="1"
+                android:inputType="textNoSuggestions"/>
         </TableRow>
 
         <TableRow
@@ -67,7 +68,7 @@
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="textMultiLine"
+                android:inputType="textMultiLine|textNoSuggestions"
                 android:ems="10"
                 android:id="@+id/etOrtAdresse"
                 android:layout_below="@+id/tableLayout"
@@ -95,7 +96,7 @@
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="textMultiLine"
+                android:inputType="textNoSuggestions"
                 android:ems="10"
                 android:id="@+id/etOrtszusatz"
                 android:layout_below="@+id/tableLayout"
@@ -117,9 +118,9 @@
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="number"
                 android:id="@+id/etKmStand"
-                android:layout_column="1" />
+                android:layout_column="1"
+                android:inputType="number|textNoSuggestions"/>
 
             <!--
             <EditText
