@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menuItemActivityStart"
+        android:title="Main Activity" />
+
+    <item android:id="@+id/menuItemActivityGps"
+        android:title="GPS Activity" />
+
+    <item android:id="@+id/menuItemActivityDatabase"
+        android:title="Datenbank" />
+</menu>
