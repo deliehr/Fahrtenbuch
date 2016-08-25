@@ -22,6 +22,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -37,9 +38,8 @@ public class activityStart extends AppCompatActivity {
         @Override
         public void onLocationChanged(Location location) {
             mLocation = location;
-            Toast.makeText(context, "location update (onLocationChanged)", Toast.LENGTH_SHORT).show();
 
-            Log.i("info", "location changed");
+            Log.i("info", "Location changed (onLocationChanged)");
 
             updateAddressField();
             updateLocationText();
@@ -169,23 +169,7 @@ public class activityStart extends AppCompatActivity {
     }
 
     static void updateLocationText() {
-        if(activityStart.tvLocation != null) {
-            String locInfo = "Genauigkeit: " + Float.toString(mLocation.getAccuracy()) + " m\n" + "Latitude: " + Double.toString(mLocation.getLatitude()) + "\n" + "Longitude: " + Double.toString(mLocation.getLongitude());
-
-            // adress
-            List<android.location.Address> addresses;
-            Geocoder geocoder = new Geocoder(activityStart.context, Locale.getDefault());
-
-            try {
-                addresses = geocoder.getFromLocation(mLocation.getLatitude(), mLocation.getLongitude(), 1);
-
-                //locInfo += ", " + addresses.get(0).getAddressLine(0) + ", " + addresses.get(0).getPostalCode() + " " + addresses.get(0).getLocality();
-            } catch (IOException exc) {
-                Log.d("error", Errors.no_addresses_available.getErrorText());
-            }
-
-            activityStart.tvLocation.setText(locInfo);
-        }
+        activityStart.tvLocation.setText("Letztes GPS-Update: " + (new SimpleDateFormat("HH:mm:ss dd.MM.yyyy")).format(new Date()));
     }
 
     // endregion
@@ -244,6 +228,8 @@ public class activityStart extends AppCompatActivity {
         }
     }
 
+    static int requestLocationUpdatesCounter = 0;
+
     static void initLocation() {
         try {
             GoogleApiClient.ConnectionCallbacks connectionFallbacks = new GoogleApiClient.ConnectionCallbacks() {
@@ -251,9 +237,14 @@ public class activityStart extends AppCompatActivity {
                 public void onConnected(@Nullable Bundle bundle) {
                     if(mLocation == null) {
                         try {
+                            requestLocationUpdatesCounter++;
                             mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, mLocationListener);
-                            Toast.makeText(context, "location update (onConnected)", Toast.LENGTH_SHORT).show();
+
+                            Log.i("info", "requestLocationUpdatesCounter = " + requestLocationUpdatesCounter);
+
+                            //Toast.makeText(context, "location update (onConnected)", Toast.LENGTH_SHORT).show();
+                            Log.i("info", "location update (onConnected)");
 
                             updateAddressField();
                             updateLocationText();
@@ -297,9 +288,6 @@ public class activityStart extends AppCompatActivity {
 
             // connect
             mGoogleApiClient.connect();
-
-
-            // LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, mLocationListener);
         } catch (Exception e) {
             Log.d("error", e.getMessage());
         }
