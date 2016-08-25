@@ -46,7 +46,7 @@ public class activityStart extends AppCompatActivity {
         }
     };
     static final long UPDATE_INTERVAL = 1000;
-    static final long FASTEST_UPDATE_INTERVAL = 500;
+    static final long FASTEST_UPDATE_INTERVAL = 100;
 
     // static views
     static TextView tvLocation = null;
@@ -163,6 +163,8 @@ public class activityStart extends AppCompatActivity {
             }
         } catch (IOException exc) {
             Log.d("error", Errors.no_addresses_available.getErrorText() + ": " + exc.getMessage());
+
+            Toast.makeText(context, "geocoder -> IOException error", Toast.LENGTH_LONG).show();
         } catch (Exception exc) {
             Log.d("error", exc.getMessage());
         }
