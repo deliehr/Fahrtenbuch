@@ -82,8 +82,8 @@ public class activityStart extends AppCompatActivity {
         }
     };
 
-    static final long UPDATE_INTERVAL = 1000;
-    static final long FASTEST_UPDATE_INTERVAL = 100;
+    static final long UPDATE_INTERVAL = 2000;
+    static final long FASTEST_UPDATE_INTERVAL = 1000;
 
     // static views
     static TextView tvLocation = null;
