@@ -14,4 +14,7 @@
 
     <item android:id="@+id/menuItemActivityConfig"
         android:title="Einstellungen" />
+
+    <item android:id="@+id/menuItemActivityPOI"
+        android:title="Points Of Interest" />
 </menu>

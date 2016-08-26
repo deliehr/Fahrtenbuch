@@ -56,15 +56,15 @@ public class activityStart extends AppCompatActivity {
                     mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                     LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, mLocationListener);
 
-                    //Toast.makeText(context, "location update (onConnected)", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(context, "location update (onConnected)", Toast.LENGTH_LONG).show();
                     Log.i("info", "location update (onConnected)");
 
                     updateAddressField();
                     updateLocationText();
                 } catch (SecurityException se) {
-                    Toast.makeText(context, "getting location not allowed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "getting location not allowed", Toast.LENGTH_LONG).show();
                 } catch (Exception e) {
-                    Toast.makeText(context, "error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
         }
@@ -78,7 +78,7 @@ public class activityStart extends AppCompatActivity {
     private static GoogleApiClient.OnConnectionFailedListener mOnConnectionFailedListener = new GoogleApiClient.OnConnectionFailedListener() {
         @Override
         public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-            Toast.makeText(context, "connection failed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "connection failed", Toast.LENGTH_LONG).show();
         }
     };
 
@@ -375,7 +375,7 @@ public class activityStart extends AppCompatActivity {
                     returnNumber = Database.getInstance(this).insertSingleItem(tmpItem);
                     Log.d("info", "return number = " + Long.toString(returnNumber));
 
-                    Toast.makeText(activityStart.this, "Fahrt gestartet ...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activityStart.this, "Fahrt gestartet ...", Toast.LENGTH_LONG).show();
                     // toast.setGravity(Gravity.TOP|Gravity.LEFT, 0, 0);
                     this.driveStarted = true;
                     this.driveEnded = false;
@@ -384,10 +384,10 @@ public class activityStart extends AppCompatActivity {
                     Log.d("error", Errors.inserting_fahrtitem_not_possible + " (" + exc.getMessage() + ")");
                 }
             } else {
-                Toast.makeText(this, "KM Stand zu niedrig!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "KM Stand zu niedrig!", Toast.LENGTH_LONG).show();
             }
         } else {
-            Toast.makeText(activityStart.this, "KM Stand eingeben!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activityStart.this, "KM Stand eingeben!", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -439,7 +439,7 @@ public class activityStart extends AppCompatActivity {
                     //lastDriveItem.setEndFields(currentDate.format(new Date()), currentTime.format(new Date()), town, address, Double.valueOf(kmstand));
                     lastDriveItem.setEndFields(currentDate.format(new Date()), currentTime.format(new Date()), town, address, Double.valueOf(kmstand), mLocation.getLatitude(), mLocation.getLongitude(), ortszusatz, privateFahrt, car);
                     long returnId = Database.getInstance(this).updateRowWithId(lastDriveItem.getId(), lastDriveItem);
-                    Toast.makeText(activityStart.this, "Fahrt beendet ...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activityStart.this, "Fahrt beendet ...", Toast.LENGTH_LONG).show();
 
                     // disable button
                     ((Button) findViewById(R.id.btnEndDrive)).setEnabled(false);
@@ -453,10 +453,10 @@ public class activityStart extends AppCompatActivity {
                     Log.d("error", Errors.updating_table_t_fahrt + ": " + exc.getMessage());
                 }
             } else {
-                Toast.makeText(activityStart.this, "KM Stand zu niedrig", Toast.LENGTH_SHORT).show();
+                Toast.makeText(activityStart.this, "KM Stand zu niedrig", Toast.LENGTH_LONG).show();
             }
         } else {
-            Toast.makeText(activityStart.this, "KM Stand eingeben!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activityStart.this, "KM Stand eingeben!", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -516,19 +516,19 @@ public class activityStart extends AppCompatActivity {
                                 c.run(bluetoothSocket.getInputStream(), bluetoothSocket.getOutputStream());
                                 Log.d("obd2", "rpms: " + c.getFormattedResult());
 
-                                (new Toast(activityStart.context)).makeText(activityStart.context, "rpms: " + c.getFormattedResult(), Toast.LENGTH_SHORT).show();
+                                (new Toast(activityStart.context)).makeText(activityStart.context, "rpms: " + c.getFormattedResult(), Toast.LENGTH_LONG).show();
 
                                 RuntimeCommand c2 = new RuntimeCommand();
                                 c.run(bluetoothSocket.getInputStream(), bluetoothSocket.getOutputStream());
                                 Log.d("obd2", "runtime: " + c.getFormattedResult());
 
-                                (new Toast(activityStart.context)).makeText(activityStart.context, "runtime: " + c2.getFormattedResult(), Toast.LENGTH_SHORT).show();
+                                (new Toast(activityStart.context)).makeText(activityStart.context, "runtime: " + c2.getFormattedResult(), Toast.LENGTH_LONG).show();
 
                                 ThrottlePositionCommand c3 = new ThrottlePositionCommand();
                                 c3.run(bluetoothSocket.getInputStream(), bluetoothSocket.getOutputStream());
                                 Log.d("obd2", "throttle: " + c.getFormattedResult());
 
-                                (new Toast(activityStart.context)).makeText(activityStart.context, "throttle: " + c3.getFormattedResult(), Toast.LENGTH_SHORT).show();
+                                (new Toast(activityStart.context)).makeText(activityStart.context, "throttle: " + c3.getFormattedResult(), Toast.LENGTH_LONG).show();
 
                                 Thread.sleep(500);
                             } catch (InterruptedException exc) {
