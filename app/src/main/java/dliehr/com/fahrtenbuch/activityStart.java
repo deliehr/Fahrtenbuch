@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.content.*;
 import android.util.Log;
 import android.view.*;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 
 import com.github.pires.obd.commands.engine.RPMCommand;
@@ -172,6 +173,11 @@ public class activityStart extends AppCompatActivity {
 
     static void updateLocationText() {
         activityStart.tvLocation.setText("Letztes GPS-Update: " + (new SimpleDateFormat("HH:mm:ss dd.MM.yyyy")).format(new Date()));
+    }
+
+    private void hideSoftwareKeyboard(View view) {
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     // endregion
