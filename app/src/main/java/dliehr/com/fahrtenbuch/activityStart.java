@@ -1,6 +1,7 @@
 package dliehr.com.fahrtenbuch;
 
 import android.bluetooth.*;
+import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.*;
@@ -46,6 +47,41 @@ public class activityStart extends AppCompatActivity {
             updateLocationText();
         }
     };
+
+    private static GoogleApiClient.ConnectionCallbacks mConnectionFallbacks = new GoogleApiClient.ConnectionCallbacks() {
+        @Override
+        public void onConnected(@Nullable Bundle bundle) {
+            if(mLocation == null) {
+                try {
+                    mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                    LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, mLocationListener);
+
+                    //Toast.makeText(context, "location update (onConnected)", Toast.LENGTH_SHORT).show();
+                    Log.i("info", "location update (onConnected)");
+
+                    updateAddressField();
+                    updateLocationText();
+                } catch (SecurityException se) {
+                    Toast.makeText(context, "getting location not allowed", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    Toast.makeText(context, "error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+
+        @Override
+        public void onConnectionSuspended(int i) {
+            mGoogleApiClient.connect();
+        }
+    };
+
+    private static GoogleApiClient.OnConnectionFailedListener mOnConnectionFailedListener = new GoogleApiClient.OnConnectionFailedListener() {
+        @Override
+        public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+            Toast.makeText(context, "connection failed", Toast.LENGTH_SHORT).show();
+        }
+    };
+
     static final long UPDATE_INTERVAL = 1000;
     static final long FASTEST_UPDATE_INTERVAL = 100;
 
@@ -145,30 +181,11 @@ public class activityStart extends AppCompatActivity {
     }
 
     static void updateAddressField() {
-        String addressInfo = "";
-
-        // adress
-        List<android.location.Address> addresses;
-        Geocoder geocoder = null;
-
-        try {
-            if(mLocation != null) {
-                geocoder = new Geocoder(context, Locale.getDefault());
-                addresses = geocoder.getFromLocation(mLocation.getLatitude(), mLocation.getLongitude(), 1);
-
-                addressInfo += addresses.get(0).getPostalCode() + " " + addresses.get(0).getLocality() + ", " + addresses.get(0).getAddressLine(0);
-
-                activityStart.etAdressField.setText(addressInfo);
-            } else {
-                Log.d("error", "location null");
-            }
-        } catch (IOException exc) {
-            Log.d("error", Errors.no_addresses_available.getErrorText() + ": " + exc.getMessage());
-
-            Toast.makeText(context, "geocoder -> IOException error", Toast.LENGTH_LONG).show();
-        } catch (Exception exc) {
-            Log.d("error", exc.getMessage());
+        if(getAddressListFromGeocoder() != null && mLocation != null) {
+            activityStart.etAdressField.setText(getAddressListFromGeocoder().get(0).getPostalCode() + " " + getAddressListFromGeocoder().get(0).getLocality() + ", " + getAddressListFromGeocoder().get(0).getAddressLine(0));
         }
+
+
     }
 
     static void updateLocationText() {
@@ -178,6 +195,30 @@ public class activityStart extends AppCompatActivity {
     private void hideSoftwareKeyboard(View view) {
         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    private static List<Address> getAddressListFromGeocoder()  {
+        List<android.location.Address> addresses;
+        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+        List<Address> addressList = null;
+
+        try {
+            addressList = geocoder.getFromLocation(mLocation.getLatitude(), mLocation.getLongitude(), 1);
+        } catch (IOException ioe) {
+            Log.d("error", Errors.no_addresses_available.getErrorText());
+
+            Toast.makeText(context, "geocoder -> IOException error", Toast.LENGTH_LONG).show();
+
+            // try to restart the service
+            stopGoogleApiClient();
+            startGoogleApiClient();
+
+            Toast.makeText(context, "location services restartet", Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Log.d("error", e.getMessage());
+        }
+
+        return addressList;
     }
 
     // endregion
@@ -236,53 +277,12 @@ public class activityStart extends AppCompatActivity {
         }
     }
 
-    static int requestLocationUpdatesCounter = 0;
-
-    static void initLocation() {
+    private static void startGoogleApiClient() {
         try {
-            GoogleApiClient.ConnectionCallbacks connectionFallbacks = new GoogleApiClient.ConnectionCallbacks() {
-                @Override
-                public void onConnected(@Nullable Bundle bundle) {
-                    if(mLocation == null) {
-                        try {
-                            requestLocationUpdatesCounter++;
-                            mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, mLocationListener);
-
-                            Log.i("info", "requestLocationUpdatesCounter = " + requestLocationUpdatesCounter);
-
-                            //Toast.makeText(context, "location update (onConnected)", Toast.LENGTH_SHORT).show();
-                            Log.i("info", "location update (onConnected)");
-
-                            updateAddressField();
-                            updateLocationText();
-                        } catch (SecurityException se) {
-                            Toast.makeText(context, "getting location not allowed", Toast.LENGTH_SHORT).show();
-                        } catch (Exception e) {
-                            Toast.makeText(context, "error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }
-
-                @Override
-                public void onConnectionSuspended(int i) {
-                    mGoogleApiClient.connect();
-                }
-            };
-
-            GoogleApiClient.OnConnectionFailedListener onConnectionFailedListener = new GoogleApiClient.OnConnectionFailedListener() {
-                @Override
-                public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                    Toast.makeText(context, "connection failed", Toast.LENGTH_SHORT).show();
-                }
-            };
-
-
-
             // builder
             GoogleApiClient.Builder googleApiClientBuilder = new GoogleApiClient.Builder(context);
-            googleApiClientBuilder.addConnectionCallbacks(connectionFallbacks);
-            googleApiClientBuilder.addOnConnectionFailedListener(onConnectionFailedListener);
+            googleApiClientBuilder.addConnectionCallbacks(mConnectionFallbacks);
+            googleApiClientBuilder.addOnConnectionFailedListener(mOnConnectionFailedListener);
             googleApiClientBuilder.addApi(LocationServices.API);
 
             // get client
@@ -294,15 +294,6 @@ public class activityStart extends AppCompatActivity {
             mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL);
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-            // connect
-            mGoogleApiClient.connect();
-        } catch (Exception e) {
-            Log.d("error", e.getMessage());
-        }
-    }
-
-    private void startGoogleApiClient() {
-        try {
             mGoogleApiClient.connect();
             mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, mLocationListener);
@@ -316,8 +307,9 @@ public class activityStart extends AppCompatActivity {
         }
     }
 
-    private void stopGoogleApiClient() {
+    private static void stopGoogleApiClient() {
         try {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, mLocationListener);
             mGoogleApiClient.disconnect();
             Log.i("info", "google api client disconnected");
         } catch (Exception e) {
@@ -357,17 +349,12 @@ public class activityStart extends AppCompatActivity {
                 SimpleDateFormat currentTime = new SimpleDateFormat("HH:mm:ss");
 
                 // town & adress
-                List<android.location.Address> addresses;
-                Geocoder geocoder = new Geocoder(this, Locale.getDefault());
                 String town = "";
                 String address = "";
 
-                try {
-                    addresses = geocoder.getFromLocation(mLocation.getLatitude(), mLocation.getLongitude(), 1);
-                    address = addresses.get(0).getAddressLine(0);
-                    town = addresses.get(0).getPostalCode() + "," + addresses.get(0).getLocality();
-                } catch (IOException exc) {
-                    Log.d("error", Errors.no_addresses_available.getErrorText());
+                if(this.getAddressListFromGeocoder() != null) {
+                    address = this.getAddressListFromGeocoder().get(0).getAddressLine(0);
+                    town = this.getAddressListFromGeocoder().get(0).getPostalCode() + "," + this.getAddressListFromGeocoder().get(0).getLocality();
                 }
 
                 try {
@@ -504,16 +491,6 @@ public class activityStart extends AppCompatActivity {
         timeThread.start();
     }
 
-    private void startLocationThread() {
-        Thread locationThread = new Thread() {
-            public void run() {
-                // init location
-                initLocation();
-            }
-        };
-        locationThread.start();
-    }
-
     private void startBluetoothThread() {
         Thread bluetoothThread = new Thread() {
             public void run() {
@@ -612,9 +589,6 @@ public class activityStart extends AppCompatActivity {
 
         // time thread
         this.startTimeThread();
-
-        // location thread
-        this.startLocationThread();
 
         // bluetooth thread
         //this.startBluetoothThread();

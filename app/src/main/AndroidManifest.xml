@@ -34,7 +34,7 @@
 
         <activity
             android:name=".activityGps"
-            android:label="GPS / Bluetooth" />
+            android:label="GPS Karte" />
 
         <activity
             android:name=".activityDatabase"

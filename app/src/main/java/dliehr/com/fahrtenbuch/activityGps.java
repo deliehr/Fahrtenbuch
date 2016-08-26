@@ -25,54 +25,10 @@ import java.util.Locale;
 
 public class activityGps extends AppCompatActivity {
 
-    // gps
-    static Location gpsLocation = null;
-
-    // static text views
-    static TextView tvBluetooth = null;
-    static TextView tvLocation = null;
-
-    // gps locationListener
-    private LocationListener gpsLocationListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(Location loc) {
-            activityGps.gpsLocation = loc;
-            activityGps.updateLocationInfo(loc, getBaseContext());
-        }
-
-        @Override
-        public void onStatusChanged(String s, int i, Bundle bundle) {
-
-        }
-
-        @Override
-        public void onProviderEnabled(String s) {
-
-        }
-
-        @Override
-        public void onProviderDisabled(String s) {
-
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_activity_gps);
-
-        // toolbar
-        //Toolbar toolbar = (Toolbar) findViewById(R.id.)
-
-        // set static text views
-        activityGps.tvLocation = (TextView) findViewById(R.id.tvLocation);
-        activityGps.tvBluetooth = (TextView) findViewById(R.id.tvBluetooth);
-
-        // bluetooth
-        this.setBluetoothInfo();
-
-        // location gps
-        this.setLocationInfo();
     }
 
     private void setBluetoothInfo() {
