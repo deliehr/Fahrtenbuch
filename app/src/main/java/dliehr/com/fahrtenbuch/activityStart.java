@@ -295,13 +295,15 @@ public class activityStart extends AppCompatActivity {
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
             mGoogleApiClient.connect();
+            Log.i("info", "google api client connected");
+
             mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, mLocationListener);
 
             updateLocationText();
             updateAddressField();
 
-            Log.i("info", "google api client connected");
+
         } catch (Exception e) {
             Log.d("error", "cannot connect to google api client");
         }
