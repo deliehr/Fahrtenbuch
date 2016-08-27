@@ -40,10 +40,7 @@ public class activityStart extends AppCompatActivity {
     private Boolean paused = false, stopped = false, calledOnRestart = false;
 
     // permissions
-    private static final int PERMISSION_INTERNET = 0;
-    private static final int PERMISSION_WRITE_EXTERNAL_STORAGE = 1;
-    private static final int PERMISSION_ACCESS_FINE_LOCATION = 2;
-    private static final int PERMISSION_ACCESS_COARSE_LOCATION = 3;
+    private static final int PERMISSIONS_INTERNET_SD_FINE_COARSE_LOCATION = 4;
 
     // gps
     static Location mLocation = null;
@@ -232,42 +229,22 @@ public class activityStart extends AppCompatActivity {
     }
 
     public void checkPermissions() {
-        // permission internet
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.INTERNET)) {
-                //
-            } else {
-                ActivityCompat.requestPermissions(this, new String[]{ android.Manifest.permission.INTERNET }, PERMISSION_INTERNET);
-            }
-        }
+        // permissions INTERNET, WRITE_EXTERNAL_STORAGE, ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION
+        Boolean permissionCheckInternet = ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED;
+        Boolean permissionCheckWriteExternalStorage = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED;
+        Boolean permissionCheckAccessFineLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED;
+        Boolean permissionCheckAccesCoarseLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED;
 
-        // permission sdcard
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                //
-            } else {
-                // request
-                ActivityCompat.requestPermissions(this, new String[]{ android.Manifest.permission.WRITE_EXTERNAL_STORAGE }, PERMISSION_WRITE_EXTERNAL_STORAGE);
-            }
-        }
+        if (permissionCheckInternet || permissionCheckWriteExternalStorage || permissionCheckAccessFineLocation || permissionCheckAccesCoarseLocation) {
+            Boolean permissionRationaleInternet = ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.INTERNET);
+            Boolean permissionRationaleWriteExternalStorage = ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            Boolean permissionRationaleAccessFineLocation = ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION);
+            Boolean permissionRationaleAccessCoarseLocation = ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION);
 
-        // permission fine location
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+            if (permissionRationaleInternet || permissionRationaleWriteExternalStorage || permissionRationaleAccessFineLocation || permissionRationaleAccessCoarseLocation) {
                 //
             } else {
-                // request
-                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_ACCESS_FINE_LOCATION);
-            }
-        }
-
-        // permission coarse location
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                //
-            } else {
-                // request
-                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_ACCESS_COARSE_LOCATION);
+                ActivityCompat.requestPermissions(this, new String[]{ android.Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION }, PERMISSIONS_INTERNET_SD_FINE_COARSE_LOCATION);
             }
         }
     }
@@ -617,39 +594,53 @@ public class activityStart extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case PERMISSION_INTERNET: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(context, "PERMISSION_INTERNET granted", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(context, "PERMISSION_INTERNET denied", Toast.LENGTH_LONG).show();
-                }
-                return;
-            }
+            case PERMISSIONS_INTERNET_SD_FINE_COARSE_LOCATION: {
+                if(grantResults.length > 0) {
+                    for(int i = 0;i < 4;i++) {
+                        switch (i) {
+                            case 0: { // internet
+                                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                                    Toast.makeText(this, "permission INTERNET granted", Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(this, "permission INTERNET _not_ granted", Toast.LENGTH_LONG).show();
+                                }
 
-            case PERMISSION_WRITE_EXTERNAL_STORAGE: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(context, "PERMISSION_WRITE_EXTERNAL_STORAGE granted", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(context, "PERMISSION_WRITE_EXTERNAL_STORAGE denied", Toast.LENGTH_LONG).show();
-                }
-                return;
-            }
+                                break;
+                            }
 
-            case PERMISSION_ACCESS_FINE_LOCATION: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(context, "PERMISSION_ACCESS_FINE_LOCATION granted", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(context, "PERMISSION_ACCESS_FINE_LOCATION denied", Toast.LENGTH_LONG).show();
-                }
-                return;
-            }
+                            case 1: { // write external storage
+                                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                                    Toast.makeText(this, "permission WRITE_EXTERNAL_STORAGE granted", Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(this, "permission WRITE_EXTERNAL_STORAGE _not_ granted", Toast.LENGTH_LONG).show();
+                                }
 
-            case PERMISSION_ACCESS_COARSE_LOCATION: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(context, "PERMISSION_ACCESS_COARSE_LOCATION granted", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(context, "PERMISSION_ACCESS_COARSE_LOCATION denied", Toast.LENGTH_LONG).show();
+                                break;
+                            }
+
+                            case 2: { // access fine location
+                                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                                    Toast.makeText(this, "permission ACCESS_FINE_LOCATION granted", Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(this, "permission ACCESS_FINE_LOCATION _not_ granted", Toast.LENGTH_LONG).show();
+                                }
+
+                                break;
+                            }
+
+                            case 3: { // access coarse location
+                                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                                    Toast.makeText(this, "permission ACCESS_COARSE_LOCATION granted", Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(this, "permission ACCESS_COARSE_LOCATION _not_ granted", Toast.LENGTH_LONG).show();
+                                }
+
+                                break;
+                            }
+                        }
+                    }
                 }
+
                 return;
             }
         }
