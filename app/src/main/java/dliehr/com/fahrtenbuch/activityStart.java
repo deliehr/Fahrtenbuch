@@ -1,12 +1,17 @@
 package dliehr.com.fahrtenbuch;
 
+import android.*;
+import android.Manifest;
 import android.bluetooth.*;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.*;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.content.*;
 import android.util.Log;
@@ -28,9 +33,17 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import dliehr.com.fahrtenbuch.PointOfInterest;
+
 public class activityStart extends AppCompatActivity {
     // app lifetime cycle
     private Boolean paused = false, stopped = false, calledOnRestart = false;
+
+    // permissions
+    private static final int PERMISSION_INTERNET = 0;
+    private static final int PERMISSION_WRITE_EXTERNAL_STORAGE = 1;
+    private static final int PERMISSION_ACCESS_FINE_LOCATION = 2;
+    private static final int PERMISSION_ACCESS_COARSE_LOCATION = 3;
 
     // gps
     static Location mLocation = null;
@@ -107,7 +120,6 @@ public class activityStart extends AppCompatActivity {
     static Context context = null;
 
     // region handle bluetooth
-
     static void startEnableBluetoothConnection() {
         try {
             // only connect if no connection exists
@@ -130,11 +142,9 @@ public class activityStart extends AppCompatActivity {
             Log.d("error", "error bluetooth 1: " + exc.getMessage());
         }
     }
-
     // endregion
 
     // region helper methods
-
     private void start() {
         startCheckingActiveDrive();
         startGetLastData();
@@ -221,10 +231,49 @@ public class activityStart extends AppCompatActivity {
         return addressList;
     }
 
+    public void checkPermissions() {
+        // permission internet
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.INTERNET)) {
+                //
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{ android.Manifest.permission.INTERNET }, PERMISSION_INTERNET);
+            }
+        }
+
+        // permission sdcard
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                //
+            } else {
+                // request
+                ActivityCompat.requestPermissions(this, new String[]{ android.Manifest.permission.WRITE_EXTERNAL_STORAGE }, PERMISSION_WRITE_EXTERNAL_STORAGE);
+            }
+        }
+
+        // permission fine location
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+                //
+            } else {
+                // request
+                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_ACCESS_FINE_LOCATION);
+            }
+        }
+
+        // permission coarse location
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                //
+            } else {
+                // request
+                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_ACCESS_COARSE_LOCATION);
+            }
+        }
+    }
     // endregion
 
     // region handle location services
-
     private void startGetLastData() {
         try {
             // check for existing active drive
@@ -318,7 +367,6 @@ public class activityStart extends AppCompatActivity {
             Log.d("error", "cannot disconntect form google api client");
         }
     }
-
     // endregion
 
     // region button event methods
@@ -567,12 +615,56 @@ public class activityStart extends AppCompatActivity {
 
     // region override methods
     @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_INTERNET: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(context, "PERMISSION_INTERNET granted", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(context, "PERMISSION_INTERNET denied", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+
+            case PERMISSION_WRITE_EXTERNAL_STORAGE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(context, "PERMISSION_WRITE_EXTERNAL_STORAGE granted", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(context, "PERMISSION_WRITE_EXTERNAL_STORAGE denied", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+
+            case PERMISSION_ACCESS_FINE_LOCATION: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(context, "PERMISSION_ACCESS_FINE_LOCATION granted", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(context, "PERMISSION_ACCESS_FINE_LOCATION denied", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+
+            case PERMISSION_ACCESS_COARSE_LOCATION: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(context, "PERMISSION_ACCESS_COARSE_LOCATION granted", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(context, "PERMISSION_ACCESS_COARSE_LOCATION denied", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_activity_start);
 
         // set context
         context = this;
+
+        // permissions
+        this.checkPermissions();
 
         // static views
         activityStart.tvLocation = (TextView) findViewById(R.id.tvLocationInfo);
@@ -679,6 +771,19 @@ public class activityStart extends AppCompatActivity {
                 startActivity(intentDb);
 
                 return true;
+
+            case R.id.menuItemActivityConfig:
+                Intent intentConfig = new Intent(this, activityConfig.class);
+                startActivity(intentConfig);
+
+                return true;
+
+            case R.id.menuItemActivityPOI:
+                Intent intentPoi = new Intent(this, activityPOIs.class);
+                startActivity(intentPoi);
+
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }

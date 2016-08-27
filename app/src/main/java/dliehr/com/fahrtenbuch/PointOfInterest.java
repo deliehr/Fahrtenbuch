@@ -46,6 +46,15 @@ public class PointOfInterest {
         pointsOfInterest.put("Zuhause", new PointOfInterest("Zuhause", 51.8211671, 8.1361084));
         pointsOfInterest.put("Uni PB Fü", new PointOfInterest("Uni PB Fü", 51.7323871, 8.7356671));
         pointsOfInterest.put("JET PB", new PointOfInterest("JET PB", 51.7431987, 8.7064774));
+        pointsOfInterest.put("Poco Außenlager Rheda", new PointOfInterest("Poco Außenlager Rheda", 51.861523, 8.2629678));
+        pointsOfInterest.put("See Beckum", new PointOfInterest("See Beckum", 51.7737455, 8.031064));
+        pointsOfInterest.put("Dirk", new PointOfInterest("See Beckum", 51.8409095, 8.1533871));
+
+        // Papa, Sascha, WG, Katrin, Julian
+
+        pointsOfInterest.put("See Beckum", new PointOfInterest("See Beckum", 51.7737455, 8.031064));
+        pointsOfInterest.put("See Beckum", new PointOfInterest("See Beckum", 51.7737455, 8.031064));
+        pointsOfInterest.put("See Beckum", new PointOfInterest("See Beckum", 51.7737455, 8.031064));
     }
 
     // region getter
@@ -58,6 +67,9 @@ public class PointOfInterest {
         location.setLongitude(this.getLongitude());
 
         return location;
+    }
+    public static Map<String, PointOfInterest> getPointsOfInterest() {
+        return pointsOfInterest;
     }
     // endregion
 

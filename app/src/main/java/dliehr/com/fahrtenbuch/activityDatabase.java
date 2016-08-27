@@ -91,8 +91,10 @@ public class activityDatabase extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-        return super.onCreateOptionsMenu(menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+
+        return true;
     }
 
     @Override
@@ -115,6 +117,19 @@ public class activityDatabase extends AppCompatActivity {
                 startActivity(intentDb);
 
                 return true;
+
+            case R.id.menuItemActivityConfig:
+                Intent intentConfig = new Intent(this, activityConfig.class);
+                startActivity(intentConfig);
+
+                return true;
+
+            case R.id.menuItemActivityPOI:
+                Intent intentPoi = new Intent(this, activityPOIs.class);
+                startActivity(intentPoi);
+
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
