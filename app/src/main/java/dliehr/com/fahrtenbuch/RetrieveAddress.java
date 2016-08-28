@@ -81,7 +81,7 @@ public class RetrieveAddress extends AsyncTask<Location, Void, Void> {
             // sending the request
             String apiRequest = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + String.valueOf(this.location.getLatitude()) +"," + String.valueOf(this.location.getLongitude()) + "&sensor=false&key=" + LOCATION_API_KEY;
 
-            //Log.i(TAG, "apiRequest = " + apiRequest);
+            Log.i(TAG, "apiRequest = " + apiRequest);
 
             HttpGet httpGet = new HttpGet(apiRequest);
             HttpClient client = new DefaultHttpClient();

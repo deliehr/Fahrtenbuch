@@ -1,0 +1,52 @@
+{
+  "points": [
+    {
+      "postal_code": "59302",
+      "locality": "Oelde",
+      "address": "Theodor-Naarmann-Straße 19",
+      "additional_info": "Zuhause",
+      "latitude": 51.8211671,
+      "longitude": 8.1361084
+    },
+    {
+      "postal_code": "33102",
+      "locality": "Paderborn",
+      "address": "Fürstenallee 9",
+      "additional_info": "Uni PB Fü",
+      "latitude": 51.7323871,
+      "longitude": 8.7356671
+    },
+    {
+      "postal_code": "33104",
+      "locality": "Paderborn",
+      "address": "Münsterstraße 11",
+      "additional_info": "JET PB",
+      "latitude": 51.7431987,
+      "longitude": 8.7064774
+    },
+    {
+      "postal_code": "33378",
+      "locality": "Rheda-Wiedenbrück",
+      "address": "Heinrich-Heineke-Straße",
+      "additional_info": "Poco Außenlager Rheda",
+      "latitude": 51.861523,
+      "longitude": 8.2629678
+    },
+    {
+      "postal_code": "59269",
+      "locality": "Beckum",
+      "address": "",
+      "additional_info": "Beckum See",
+      "latitude": 51.7737455,
+      "longitude": 8.031064
+    },
+    {
+      "postal_code": "59302",
+      "locality": "Oelde",
+      "address": "Bonhoefferstraße 5",
+      "additional_info": "Dirk",
+      "latitude": 51.8409095,
+      "longitude": 8.1533871
+    }
+  ]
+}

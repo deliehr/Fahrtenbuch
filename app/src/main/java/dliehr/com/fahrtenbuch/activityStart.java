@@ -21,7 +21,18 @@ import com.github.pires.obd.commands.engine.*;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.*;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -145,42 +156,6 @@ public class activityStart extends AppCompatActivity {
         //startEnableBluetoothConnection();
     }
 
-    public void voidTestAddress(View view) {
-        if(mLocation != null) {
-            RetrieveAddress retrieveAddress = new RetrieveAddress(mLocation);
-            retrieveAddress.execute(mLocation);
-
-            Log.i(TAG, "voidTestAddress, getRetrievingSuccessfull = " + String.valueOf(retrieveAddress.isBackgroundJobDone()));
-
-            while(retrieveAddress.isBackgroundJobDone() != true) {
-                try {
-                    Thread.sleep(100);
-                } catch (Exception e) {
-
-                }
-
-                Log.i(TAG, "voidTestAddress, wait");
-            }
-
-
-            Log.i(TAG, "SUCCESS");
-
-            Address address = retrieveAddress.getAddress();
-
-            if(address != null) {
-                Log.i(TAG, "voidTestAddress, address not null");
-
-                Log.i(TAG, "locality = " + address.getLocality().toString());
-            } else {
-                Log.i(TAG, "voidTestAddress, address null");
-            }
-
-            Log.i(TAG, "voidTestAddress, location not null");
-        } else {
-            Log.i(TAG, "voidTestAddress, location null");
-        }
-    }
-
     private void startCheckingActiveDrive() {
         try {
             // check for existing active drive
@@ -220,13 +195,36 @@ public class activityStart extends AppCompatActivity {
         }
     }
 
-    static void updateAddressField() {
-        RetrieveAddress retrieveAddress = new RetrieveAddress(mLocation);
-        retrieveAddress.execute(mLocation);
-        retrieveAddress.waitForTaskFinish();
+    private static Address findAddressInCache() {
+        if(mLocation != null) {
+            Float delta = 0.0f;
+            List<PointOfInterest> points = PointOfInterest.getPointsOfInterest();
 
-        Address currentAddress = null;
-        currentAddress = retrieveAddress.getAddress();
+            for(int i=0;i < points.size();i++) {
+                delta = mLocation.distanceTo(points.get(i).getLocation());
+
+                // within 31 meters
+                if(delta < 31) {
+                    return points.get(i).getAddress();
+                }
+            }
+        }
+
+        return null;
+    }
+
+    static void updateAddressField() {
+        // first, look in cache
+        Address currentAddress = findAddressInCache();
+
+        if(currentAddress == null) {
+            RetrieveAddress retrieveAddress = new RetrieveAddress(mLocation);
+            retrieveAddress.execute(mLocation);
+            retrieveAddress.waitForTaskFinish();
+            currentAddress = retrieveAddress.getAddress();
+        } else {
+            Log.i(TAG, "take address from cache");
+        }
 
         if(currentAddress != null) {
             activityStart.etAdressField.setText(currentAddress.getPostalCode() + " " + currentAddress.getLocality() + ", " + currentAddress.getAddressLine(0));
@@ -625,6 +623,8 @@ public class activityStart extends AppCompatActivity {
         bluetoothThread.start();
     }
     // endregion
+
+
 
     // region override methods
     @Override
