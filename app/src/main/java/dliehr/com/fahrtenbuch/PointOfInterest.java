@@ -93,10 +93,10 @@ public class PointOfInterest {
                         JSONObject poi = points.getJSONObject(i);
 
                         PointOfInterest pointOfInterest = new PointOfInterest();
-                        pointOfInterest.setPostalCode(new String(poi.get("postal_code").toString().getBytes("ISO-8859-1"), "UTF-8"));
-                        pointOfInterest.setLocality(new String(poi.get("locality").toString().getBytes("ISO-8859-1"), "UTF-8"));
-                        pointOfInterest.setAddressLine(new String(poi.get("address").toString().getBytes("ISO-8859-1"), "UTF-8"));
-                        pointOfInterest.setAdditionalInfo(new String(poi.get("additional_info").toString().getBytes("ISO-8859-1"), "UTF-8"));
+                        pointOfInterest.setPostalCode(new String(poi.get("postal_code").toString().getBytes("UTF-8"), "UTF-8"));
+                        pointOfInterest.setLocality(new String(poi.get("locality").toString().getBytes("UTF-8"), "UTF-8"));
+                        pointOfInterest.setAddressLine(new String(poi.get("address").toString().getBytes("UTF-8"), "UTF-8"));
+                        pointOfInterest.setAdditionalInfo(new String(poi.get("additional_info").toString().getBytes("UTF-8"), "UTF-8"));
                         //pointOfInterest.setLatitude(new String(poi.get("latitude").toString().getBytes("ISO-8859-1"), "UTF-8"));
                         //pointOfInterest.setLongitude(new String(poi.get("longitude").toString().getBytes("ISO-8859-1"), "UTF-8"));
                         //pointOfInterest.setLatitude(Double.valueOf(new String(poi.get("latitude").toString().getBytes("ISO-8859-1"), "UTF-8")));

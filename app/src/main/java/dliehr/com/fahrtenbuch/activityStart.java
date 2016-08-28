@@ -99,8 +99,8 @@ public class activityStart extends AppCompatActivity {
         }
     };
 
-    static final long UPDATE_INTERVAL = 2000;
-    static final long FASTEST_UPDATE_INTERVAL = 1000;
+    static final long UPDATE_INTERVAL = 1000;
+    static final long FASTEST_UPDATE_INTERVAL = 500;
     private static final String LOCATION_API_KEY = "AIzaSyDFfDvQ-h8XaY3ZqDgooEOW38Aj9oEAf5Q";
 
     // static views
@@ -108,6 +108,7 @@ public class activityStart extends AppCompatActivity {
     static EditText etAdressField = null;
     static EditText etTimeDateField = null;
     static EditText etKmStand = null;
+    static EditText etAdditionalInfo = null;
 
     // drive
     boolean driveStarted = false;
@@ -195,6 +196,7 @@ public class activityStart extends AppCompatActivity {
         }
     }
 
+    private static PointOfInterest mPoiFromFoundAddress = null;
     private static Address findAddressInCache() {
         if(mLocation != null) {
             Float delta = 0.0f;
@@ -205,17 +207,25 @@ public class activityStart extends AppCompatActivity {
 
                 // within 31 meters
                 if(delta < 31) {
+                    mPoiFromFoundAddress = points.get(i);
                     return points.get(i).getAddress();
                 }
             }
         }
 
+        mPoiFromFoundAddress = null;
         return null;
     }
 
     static void updateAddressField() {
         // first, look in cache
-        Address currentAddress = findAddressInCache();
+        Address currentAddress = null;
+
+        try {
+            currentAddress = findAddressInCache();
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
 
         if(currentAddress == null) {
             RetrieveAddress retrieveAddress = new RetrieveAddress(mLocation);
@@ -227,9 +237,20 @@ public class activityStart extends AppCompatActivity {
         }
 
         if(currentAddress != null) {
-            activityStart.etAdressField.setText(currentAddress.getPostalCode() + " " + currentAddress.getLocality() + ", " + currentAddress.getAddressLine(0));
+            try {
+                etAdressField.setText(currentAddress.getPostalCode() + " " + currentAddress.getLocality() + ", " + currentAddress.getAddressLine(0));
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage());
+            }
+
+            try {
+                etAdditionalInfo.setText(mPoiFromFoundAddress.getAdditionalInfo());
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage());
+            }
+
         } else {
-            Log.d("error", "void updateAddressField(): currentAddress is null");
+            Log.e(TAG, "void updateAddressField(): currentAddress is null");
         }
     }
 
@@ -700,13 +721,14 @@ public class activityStart extends AppCompatActivity {
         this.startLocationThread();
 
         // static views
-        activityStart.tvLocation = (TextView) findViewById(R.id.tvLocationInfo);
-        activityStart.etTimeDateField = (EditText) findViewById(R.id.etDatumUhrzeit);
-        activityStart.etAdressField = (EditText) findViewById(R.id.etOrtAdresse);
-        activityStart.etKmStand = (EditText) findViewById(R.id.etKmStand);
+        tvLocation = (TextView) findViewById(R.id.tvLocationInfo);
+        etTimeDateField = (EditText) findViewById(R.id.etDatumUhrzeit);
+        etAdressField = (EditText) findViewById(R.id.etOrtAdresse);
+        etKmStand = (EditText) findViewById(R.id.etKmStand);
+        etAdditionalInfo = (EditText) findViewById(R.id.etOrtszusatz);
 
         // bluetooth
-        activityStart.bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // end stop button
         ((Button) findViewById(R.id.btnEndDrive)).setEnabled(false);
