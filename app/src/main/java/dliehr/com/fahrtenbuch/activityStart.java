@@ -1,6 +1,5 @@
 package dliehr.com.fahrtenbuch;
 
-import android.*;
 import android.Manifest;
 import android.bluetooth.*;
 import android.content.pm.PackageManager;
@@ -18,33 +17,13 @@ import android.util.Log;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
-
-import com.github.pires.obd.commands.engine.RPMCommand;
-import com.github.pires.obd.commands.engine.RuntimeCommand;
-import com.github.pires.obd.commands.engine.ThrottlePositionCommand;
+import com.github.pires.obd.commands.engine.*;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-
+import com.google.android.gms.location.*;
 import java.io.IOException;
-import java.io.InputStream;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.HttpResponseException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import dliehr.com.fahrtenbuch.PointOfInterest;
 
 // google geolocation api key
 // name: server_key_fahrtenbuch
@@ -72,7 +51,7 @@ public class activityStart extends AppCompatActivity {
         public void onLocationChanged(Location location) {
             mLocation = location;
 
-            Log.i("info", "Location changed (onLocationChanged)");
+            Log.i(TAG, "Location changed (onLocationChanged)");
 
             updateAddressField();
             updateLocationText();
@@ -87,7 +66,6 @@ public class activityStart extends AppCompatActivity {
                     mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                     LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, mLocationListener);
 
-                    //Toast.makeText(context, "location update (onConnected)", Toast.LENGTH_LONG).show();
                     Log.i(TAG, "location update (onConnected)");
                 } catch (SecurityException se) {
                     //Toast.makeText(context, "getting location not allowed", Toast.LENGTH_LONG).show();
@@ -100,8 +78,6 @@ public class activityStart extends AppCompatActivity {
         @Override
         public void onConnectionSuspended(int i) {
             Log.e(TAG, "ConnectionCallbacks, onConnectionSuspended");
-
-            //startGoogleApiClient();
         }
     };
 
@@ -109,8 +85,6 @@ public class activityStart extends AppCompatActivity {
         @Override
         public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
             Log.e(TAG, "OnConnectionFailedListener, connection failed");
-
-            //startGoogleApiClient();
         }
     };
 
@@ -422,6 +396,7 @@ public class activityStart extends AppCompatActivity {
                 // town & adress
                 RetrieveAddress retrieveAddress = new RetrieveAddress(mLocation);
                 retrieveAddress.execute(mLocation);
+                retrieveAddress.waitForTaskFinish();
                 Address currentAddress = retrieveAddress.getAddress();
                 String address = "";
                 String town = "";
@@ -450,6 +425,7 @@ public class activityStart extends AppCompatActivity {
                     Log.d("info", "return number = " + Long.toString(returnNumber));
 
                     Toast.makeText(activityStart.this, "Fahrt gestartet ...", Toast.LENGTH_LONG).show();
+                    this.hideSoftwareKeyboard(view);
                     this.driveStarted = true;
                     this.driveEnded = false;
                     this.lastKmstand = Integer.valueOf(kmstand);
@@ -490,17 +466,18 @@ public class activityStart extends AppCompatActivity {
                 SimpleDateFormat currentTime = new SimpleDateFormat("HH:mm:ss");
 
                 // town & adress
-                List<android.location.Address> addresses;
-                Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-                String town = "";
+                RetrieveAddress retrieveAddress = new RetrieveAddress(mLocation);
+                retrieveAddress.execute(mLocation);
+                retrieveAddress.waitForTaskFinish();
+                Address currentAddress = retrieveAddress.getAddress();
                 String address = "";
+                String town = "";
 
-                try {
-                    addresses = geocoder.getFromLocation(mLocation.getLatitude(), mLocation.getLongitude(), 1);
-                    address = addresses.get(0).getAddressLine(0);
-                    town = addresses.get(0).getPostalCode() + "," + addresses.get(0).getLocality();
-                } catch (IOException exc) {
-                    Log.d("error", Errors.no_addresses_available.getErrorText());
+                if(currentAddress != null) {
+                    address = currentAddress.getAddressLine(0);
+                    town = currentAddress.getPostalCode() + "," + currentAddress.getLocality();
+                } else {
+                    Log.d("error", "void btnClickStartDrive(): currentAddress is null");
                 }
 
                 String ortszusatz = ((EditText) findViewById(R.id.etOrtszusatz)).getText().toString();
