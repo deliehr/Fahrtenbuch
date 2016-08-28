@@ -4,7 +4,6 @@ import android.Manifest;
 import android.bluetooth.*;
 import android.content.pm.PackageManager;
 import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.*;
 import android.support.annotation.NonNull;
@@ -21,18 +20,7 @@ import com.github.pires.obd.commands.engine.*;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.*;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -527,6 +515,10 @@ public class activityStart extends AppCompatActivity {
         } else {
             Toast.makeText(activityStart.this, "KM Stand eingeben!", Toast.LENGTH_LONG).show();
         }
+    }
+
+    public void btnClickAddPoi(View view) {
+
     }
 
     // endregion

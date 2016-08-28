@@ -66,6 +66,19 @@ public class PointOfInterest {
 
         return tmpLocation;
     }
+
+    public String getFormattedResult() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.getAdditionalInfo());
+        sb.append(": ");
+        sb.append(this.getPostalCode());
+        sb.append(" ");
+        sb.append(this.getLocality());
+        sb.append(", ");
+        sb.append(this.getAddressLine());
+
+        return sb.toString();
+    }
     // endregion
 
     // region object setter

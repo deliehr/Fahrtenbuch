@@ -179,6 +179,16 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="POI (+)"
+        android:id="@+id/btnAddPoi"
+        android:layout_below="@+id/btnEndDrive"
+        android:layout_alignParentStart="true"
+        android:onClick="btnClickAddPoi"/>
+
     <!--
     <Button
         android:layout_width="match_parent"
