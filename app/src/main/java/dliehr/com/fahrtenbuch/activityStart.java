@@ -198,7 +198,7 @@ public class activityStart extends AppCompatActivity {
     private static Address findAddressInCache() {
         if(mLocation != null) {
             Float delta = 0.0f;
-            List<PointOfInterest> points = PointOfInterest.getPointsOfInterest();
+            List<PointOfInterest> points = PointOfInterest.getPoints(context);
 
             for(int i=0;i < points.size();i++) {
                 delta = mLocation.distanceTo(points.get(i).getLocation());

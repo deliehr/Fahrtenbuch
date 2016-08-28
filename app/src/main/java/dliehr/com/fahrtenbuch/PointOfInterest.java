@@ -1,9 +1,22 @@
 package dliehr.com.fahrtenbuch;
 
+import android.content.Context;
 import android.location.Address;
 import android.location.Location;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,119 +28,122 @@ import java.util.Map;
  */
 public class PointOfInterest {
     private static final String TAG = activityStart.class.getSimpleName();
+    private static final Locale mGermanLocale = Locale.GERMAN;
 
-    private Address address = null;
-    private String additionalnfo = null;
-    private Double latitude = null;
-    private Double longitude = null;
-    private static List<PointOfInterest> pointsOfInterest = null;
+    String postalCode = "";
+    String locality = "";
+    String addressLine = "";
+    String additionalInfo = "";
+    Double latitude = 0.0;
+    Double longitude = 0.0;
 
     public PointOfInterest() {
-        // set pois
-        this.setPointsOfInterest();
     }
 
-    public PointOfInterest(Address _address, String _additionalInfo, Double _latitude, Double _longitude) {
-        if(_address != null && _additionalInfo != null && _latitude != null && _longitude != null) {
-            this.setAddress(_address);
-            this.setAdditionalnfo(_additionalInfo);
-            this.setLatitude(_latitude);
-            this.setLongitude(_longitude);
+    // region object getter
+    public String getPostalCode() { return this.postalCode; }
+    public String getLocality() { return this.locality; }
+    public String getAddressLine() { return this.addressLine; }
+    public String getAdditionalInfo() { return this.additionalInfo; }
+    public Double getLatitude() { return this.latitude; }
+    public Double getLongitude() { return this.longitude; }
 
-            Location tmpLocation = new Location(_additionalInfo);
-            tmpLocation.setLatitude(_latitude);
-            tmpLocation.setLongitude(_longitude);
-            this.setLocation(tmpLocation);
-        }
+    public Address getAddress() {
+        Address tmpAddress = new Address(mGermanLocale);
+        tmpAddress.setAddressLine(0, this.getAddressLine());
+        tmpAddress.setPostalCode(this.getPostalCode());
+        tmpAddress.setLocality(this.getLocality());
+        tmpAddress.setLatitude(this.getLatitude());
+        tmpAddress.setLongitude(this.getLongitude());
+
+        return tmpAddress;
     }
 
-    public PointOfInterest(Address _address, String _additionalInfo, Location _location) {
-        if(_address != null && _additionalInfo != null && _location != null) {
-            this.setAddress(_address);
-            this.setAdditionalnfo(_additionalInfo);
-            this.setLatitude(_location.getLatitude());
-            this.setLongitude(_location.getLongitude());
-            this.setLocation(_location);
-        }
-    }
+    public Location getLocation() {
+        Location tmpLocation = new Location(this.getAdditionalInfo());
+        tmpLocation.setLatitude(this.getLatitude());
+        tmpLocation.setLongitude(this.getLongitude());
 
-    private static void setPointsOfInterest() {
-        pointsOfInterest = new ArrayList<PointOfInterest>();
+        return tmpLocation;
+    }
+    // endregion
+
+    // region object setter
+    public void setPostalCode(String postalCode) { this.postalCode = postalCode; }
+    public void setLocality(String locality) { this.locality = locality; }
+    public void setAddressLine(String addressLine) { this.addressLine = addressLine; }
+    public void setAdditionalInfo(String additionalInfo) { this.additionalInfo = additionalInfo; }
+    public void setLatitude(Double latitude) { this.latitude = latitude; }
+    public void setLongitude(Double longitude) { this.longitude = longitude; }
+    // endregion
+
+    // region class getter
+    public static List<PointOfInterest> getPoints(Context context) {
+        List<PointOfInterest> tmpPoints = new ArrayList<PointOfInterest>();
+
+        // this.address.setLocality(new String(component.getString("long_name").getBytes("ISO-8859-1"), "UTF-8"));
 
         try {
-            Address tmpAddress = new Address(Locale.GERMANY);
-            tmpAddress.setPostalCode("59302");
-            tmpAddress.setLocality("Oelde");
-            tmpAddress.setAddressLine(0, "");
-            pointsOfInterest.add(new PointOfInterest(tmpAddress, "Zuhause", 51.8211671, 8.1361084));
+            JSONObject jsonFile = new JSONObject(getJSONContent(context));
 
-            tmpAddress = new Address(Locale.GERMANY);
-            tmpAddress.setPostalCode("33102");
-            tmpAddress.setLocality("Paderborn");
-            tmpAddress.setAddressLine(0, "Fürstenallee 9");
-            pointsOfInterest.add(new PointOfInterest(tmpAddress, "Uni PB Fü", 51.7323871, 8.7356671));
+            if(jsonFile.has("points")) {
+                JSONArray points = jsonFile.getJSONArray("points");
+                if(points.length() > 0) {
+                    for(int i=0;i < points.length();i++) {
+                        JSONObject poi = points.getJSONObject(i);
 
-            tmpAddress = new Address(Locale.GERMANY);
-            tmpAddress.setPostalCode("33104");
-            tmpAddress.setLocality("Paderborn");
-            tmpAddress.setAddressLine(0, "Münsterstraße 11");
-            pointsOfInterest.add(new PointOfInterest(tmpAddress, "JET PB", 51.7431987, 8.7064774));
+                        PointOfInterest pointOfInterest = new PointOfInterest();
+                        pointOfInterest.setPostalCode(new String(poi.get("postal_code").toString().getBytes("ISO-8859-1"), "UTF-8"));
+                        pointOfInterest.setLocality(new String(poi.get("locality").toString().getBytes("ISO-8859-1"), "UTF-8"));
+                        pointOfInterest.setAddressLine(new String(poi.get("address").toString().getBytes("ISO-8859-1"), "UTF-8"));
+                        pointOfInterest.setAdditionalInfo(new String(poi.get("additional_info").toString().getBytes("ISO-8859-1"), "UTF-8"));
+                        //pointOfInterest.setLatitude(new String(poi.get("latitude").toString().getBytes("ISO-8859-1"), "UTF-8"));
+                        //pointOfInterest.setLongitude(new String(poi.get("longitude").toString().getBytes("ISO-8859-1"), "UTF-8"));
+                        //pointOfInterest.setLatitude(Double.valueOf(new String(poi.get("latitude").toString().getBytes("ISO-8859-1"), "UTF-8")));
+                        //pointOfInterest.setLongitude(Double.valueOf(new String(poi.get("longitude").toString().getBytes("ISO-8859-1"), "UTF-8")));
+                        pointOfInterest.setLatitude(Double.valueOf(poi.get("latitude").toString()));
+                        pointOfInterest.setLongitude(Double.valueOf(poi.get("longitude").toString()));
 
-            tmpAddress = new Address(Locale.GERMANY);
-            tmpAddress.setPostalCode("33378");
-            tmpAddress.setLocality("Rheda-Wiedenbrück");
-            tmpAddress.setAddressLine(0, "Heinrich-Heineke-Straße");
-            pointsOfInterest.add(new PointOfInterest(tmpAddress, "Poco Außenlager Rheda", 51.861523, 8.2629678));
-
-            tmpAddress = new Address(Locale.GERMANY);
-            tmpAddress.setPostalCode("59269");
-            tmpAddress.setLocality("Beckum");
-            tmpAddress.setAddressLine(0, "");
-            pointsOfInterest.add(new PointOfInterest(tmpAddress, "See Beckum", 51.7737455, 8.031064));
-
-            tmpAddress = new Address(Locale.GERMANY);
-            tmpAddress.setPostalCode("59302");
-            tmpAddress.setLocality("Oelde");
-            tmpAddress.setAddressLine(0, "TBonhoefferstraße 5");
-            pointsOfInterest.add(new PointOfInterest(tmpAddress, "Dirk", 51.8409095, 8.1533871));
+                        tmpPoints.add(pointOfInterest);
+                    }
+                }
+            }
+        } catch (JSONException jsoe) {
+            Log.e(TAG, jsoe.getMessage());
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
 
-        // Papa, Sascha, WG, Katrin, Julian
-
-    }
-
-    // region getter
-    public Address getAddress() { return this.address; }
-    public String getAdditionalnfo() { return this.additionalnfo; }
-    public Double getLatitude() { return this.latitude; }
-    public Double getLongitude() { return this.longitude; }
-
-    public Location getLocation() {
-        Location location = new Location(this.getAdditionalnfo());
-        location.setLatitude(this.getLatitude());
-        location.setLongitude(this.getLongitude());
-
-        return location;
-    }
-    public static List<PointOfInterest> getPointsOfInterest() {
-        setPointsOfInterest();
-
-        return pointsOfInterest;
+        return tmpPoints;
     }
     // endregion
 
-    // region setter
-    public void setAddress(Address _address) { this.address = _address; }
-    public void setAdditionalnfo(String _additionalInfo) { this.additionalnfo = _additionalInfo; }
-    public void setLatitude(Double _latitude) { this.latitude = _latitude; }
-    public void setLongitude(Double _longitude) { this.longitude = _longitude; }
-    public void setLocation(Location _location) {
-        if(_location != null) {
-            this.setLatitude(_location.getLatitude());
-            this.setLongitude(_location.getLongitude());
+    // region class methods
+    private static String getJSONContent(Context context) {
+        InputStream is = context.getResources().openRawResource(R.raw.json_test_file);
+        Writer writer = new StringWriter();
+        char[] buffer = new char[1024];
+        try {
+            Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            int n;
+            while((n = reader.read(buffer)) != -1) {
+                writer.write(buffer, 0, n);
+            }
+        } catch (UnsupportedEncodingException uee) {
+            Log.e(TAG, uee.getMessage());
+        } catch (IOException ioe) {
+            Log.e(TAG, ioe.getMessage());
+        }finally {
+            try {
+                is.close();
+            } catch (IOException ioe) {
+                Log.e(TAG, ioe.getMessage());
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage());
+            }
         }
+
+        return writer.toString();
     }
     // endregion
 }
