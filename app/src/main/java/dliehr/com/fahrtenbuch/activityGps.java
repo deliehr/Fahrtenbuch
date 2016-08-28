@@ -33,10 +33,6 @@ public class activityGps extends AppCompatActivity {
         ((Toast) Toast.makeText(this, String.valueOf((delta / 1000.0)) + " km", Toast.LENGTH_LONG)).show();
     }
 
-
-
-
-
     @Override
     protected void onStart() {
         super.onStart();

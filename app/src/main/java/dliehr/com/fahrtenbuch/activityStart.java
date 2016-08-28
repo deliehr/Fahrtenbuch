@@ -29,15 +29,36 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.HttpResponseException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import dliehr.com.fahrtenbuch.PointOfInterest;
 
+// google geolocation api key
+// name: server_key_fahrtenbuch
+// key: AIzaSyDFfDvQ-h8XaY3ZqDgooEOW38Aj9oEAf5Q
+
 public class activityStart extends AppCompatActivity {
+    // app
+    private static final String TAG = activityStart.class.getSimpleName();
+
     // app lifetime cycle
     private Boolean paused = false, stopped = false, calledOnRestart = false;
+    private Boolean overrideVoidOnCreateCalled = false;
+    private Boolean overrideVoidOnStartCalled = false;
+    private Boolean overrideVoidOnResumeCalled = false;
 
     // permissions
     private static final int PERMISSIONS_INTERNET_SD_FINE_COARSE_LOCATION = 4;
@@ -67,33 +88,35 @@ public class activityStart extends AppCompatActivity {
                     LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, mLocationListener);
 
                     //Toast.makeText(context, "location update (onConnected)", Toast.LENGTH_LONG).show();
-                    Log.i("info", "location update (onConnected)");
-
-                    updateAddressField();
-                    updateLocationText();
+                    Log.i(TAG, "location update (onConnected)");
                 } catch (SecurityException se) {
-                    Toast.makeText(context, "getting location not allowed", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(context, "getting location not allowed", Toast.LENGTH_LONG).show();
                 } catch (Exception e) {
-                    Toast.makeText(context, "error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    //Toast.makeText(context, "error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
         }
 
         @Override
         public void onConnectionSuspended(int i) {
-            mGoogleApiClient.connect();
+            Log.e(TAG, "ConnectionCallbacks, onConnectionSuspended");
+
+            //startGoogleApiClient();
         }
     };
 
     private static GoogleApiClient.OnConnectionFailedListener mOnConnectionFailedListener = new GoogleApiClient.OnConnectionFailedListener() {
         @Override
         public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-            Toast.makeText(context, "connection failed", Toast.LENGTH_LONG).show();
+            Log.e(TAG, "OnConnectionFailedListener, connection failed");
+
+            //startGoogleApiClient();
         }
     };
 
     static final long UPDATE_INTERVAL = 2000;
     static final long FASTEST_UPDATE_INTERVAL = 1000;
+    private static final String LOCATION_API_KEY = "AIzaSyDFfDvQ-h8XaY3ZqDgooEOW38Aj9oEAf5Q";
 
     // static views
     static TextView tvLocation = null;
@@ -148,6 +171,42 @@ public class activityStart extends AppCompatActivity {
         //startEnableBluetoothConnection();
     }
 
+    public void voidTestAddress(View view) {
+        if(mLocation != null) {
+            RetrieveAddress retrieveAddress = new RetrieveAddress(mLocation);
+            retrieveAddress.execute(mLocation);
+
+            Log.i(TAG, "voidTestAddress, getRetrievingSuccessfull = " + String.valueOf(retrieveAddress.isBackgroundJobDone()));
+
+            while(retrieveAddress.isBackgroundJobDone() != true) {
+                try {
+                    Thread.sleep(100);
+                } catch (Exception e) {
+
+                }
+
+                Log.i(TAG, "voidTestAddress, wait");
+            }
+
+
+            Log.i(TAG, "SUCCESS");
+
+            Address address = retrieveAddress.getAddress();
+
+            if(address != null) {
+                Log.i(TAG, "voidTestAddress, address not null");
+
+                Log.i(TAG, "locality = " + address.getLocality().toString());
+            } else {
+                Log.i(TAG, "voidTestAddress, address null");
+            }
+
+            Log.i(TAG, "voidTestAddress, location not null");
+        } else {
+            Log.i(TAG, "voidTestAddress, location null");
+        }
+    }
+
     private void startCheckingActiveDrive() {
         try {
             // check for existing active drive
@@ -188,11 +247,18 @@ public class activityStart extends AppCompatActivity {
     }
 
     static void updateAddressField() {
-        if(getAddressListFromGeocoder() != null && mLocation != null) {
-            activityStart.etAdressField.setText(getAddressListFromGeocoder().get(0).getPostalCode() + " " + getAddressListFromGeocoder().get(0).getLocality() + ", " + getAddressListFromGeocoder().get(0).getAddressLine(0));
+        RetrieveAddress retrieveAddress = new RetrieveAddress(mLocation);
+        retrieveAddress.execute(mLocation);
+        retrieveAddress.waitForTaskFinish();
+
+        Address currentAddress = null;
+        currentAddress = retrieveAddress.getAddress();
+
+        if(currentAddress != null) {
+            activityStart.etAdressField.setText(currentAddress.getPostalCode() + " " + currentAddress.getLocality() + ", " + currentAddress.getAddressLine(0));
+        } else {
+            Log.d("error", "void updateAddressField(): currentAddress is null");
         }
-
-
     }
 
     static void updateLocationText() {
@@ -204,47 +270,25 @@ public class activityStart extends AppCompatActivity {
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    private static List<Address> getAddressListFromGeocoder()  {
-        List<android.location.Address> addresses;
-        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
-        List<Address> addressList = null;
-
-        try {
-            addressList = geocoder.getFromLocation(mLocation.getLatitude(), mLocation.getLongitude(), 1);
-        } catch (IOException ioe) {
-            Log.d("error", Errors.no_addresses_available.getErrorText());
-
-            Toast.makeText(context, "geocoder -> IOException error", Toast.LENGTH_LONG).show();
-
-            // try to restart the service
-            stopGoogleApiClient();
-            startGoogleApiClient();
-
-            Toast.makeText(context, "location services restartet", Toast.LENGTH_LONG).show();
-        } catch (Exception e) {
-            Log.d("error", e.getMessage());
-        }
-
-        return addressList;
-    }
-
     public void checkPermissions() {
         // permissions INTERNET, WRITE_EXTERNAL_STORAGE, ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION
         Boolean permissionCheckInternet = ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED;
         Boolean permissionCheckWriteExternalStorage = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED;
         Boolean permissionCheckAccessFineLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED;
         Boolean permissionCheckAccesCoarseLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED;
+        Boolean permissionCheckBluetooth = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED;
 
-        if (permissionCheckInternet || permissionCheckWriteExternalStorage || permissionCheckAccessFineLocation || permissionCheckAccesCoarseLocation) {
+        if (permissionCheckInternet || permissionCheckWriteExternalStorage || permissionCheckAccessFineLocation || permissionCheckAccesCoarseLocation || permissionCheckBluetooth) {
             Boolean permissionRationaleInternet = ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.INTERNET);
             Boolean permissionRationaleWriteExternalStorage = ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
             Boolean permissionRationaleAccessFineLocation = ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION);
             Boolean permissionRationaleAccessCoarseLocation = ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION);
+            Boolean permissionRationaleBluetooth = ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.BLUETOOTH);
 
-            if (permissionRationaleInternet || permissionRationaleWriteExternalStorage || permissionRationaleAccessFineLocation || permissionRationaleAccessCoarseLocation) {
+            if (permissionRationaleInternet || permissionRationaleWriteExternalStorage || permissionRationaleAccessFineLocation || permissionRationaleAccessCoarseLocation || permissionRationaleBluetooth) {
                 //
             } else {
-                ActivityCompat.requestPermissions(this, new String[]{ android.Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION }, PERMISSIONS_INTERNET_SD_FINE_COARSE_LOCATION);
+                ActivityCompat.requestPermissions(this, new String[]{ android.Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.BLUETOOTH }, PERMISSIONS_INTERNET_SD_FINE_COARSE_LOCATION);
             }
         }
     }
@@ -314,6 +358,8 @@ public class activityStart extends AppCompatActivity {
             // get client
             mGoogleApiClient = googleApiClientBuilder.build();
 
+            Log.i(TAG, "Google play services version = " + String.valueOf(context.getPackageManager().getPackageInfo("com.google.android.gms", 0).versionCode));
+
             // location request
             mLocationRequest = new LocationRequest();
             mLocationRequest.setInterval(UPDATE_INTERVAL);
@@ -325,13 +371,11 @@ public class activityStart extends AppCompatActivity {
 
             mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, mLocationListener);
-
-            updateLocationText();
-            updateAddressField();
-
-
-        } catch (Exception e) {
-            Log.d("error", "cannot connect to google api client");
+        } catch(SecurityException se) {
+            Log.d("error", "security exception: " + Errors.gettings_gps_location_not_allowed + ": " + se.getMessage());
+        }
+        catch (Exception e) {
+            Log.e(TAG, e.getMessage());
         }
     }
 
@@ -376,12 +420,17 @@ public class activityStart extends AppCompatActivity {
                 SimpleDateFormat currentTime = new SimpleDateFormat("HH:mm:ss");
 
                 // town & adress
-                String town = "";
+                RetrieveAddress retrieveAddress = new RetrieveAddress(mLocation);
+                retrieveAddress.execute(mLocation);
+                Address currentAddress = retrieveAddress.getAddress();
                 String address = "";
+                String town = "";
 
-                if(this.getAddressListFromGeocoder() != null) {
-                    address = this.getAddressListFromGeocoder().get(0).getAddressLine(0);
-                    town = this.getAddressListFromGeocoder().get(0).getPostalCode() + "," + this.getAddressListFromGeocoder().get(0).getLocality();
+                if(currentAddress != null) {
+                    address = currentAddress.getAddressLine(0);
+                    town = currentAddress.getPostalCode() + "," + currentAddress.getLocality();
+                } else {
+                    Log.d("error", "void btnClickStartDrive(): currentAddress is null");
                 }
 
                 try {
@@ -401,7 +450,6 @@ public class activityStart extends AppCompatActivity {
                     Log.d("info", "return number = " + Long.toString(returnNumber));
 
                     Toast.makeText(activityStart.this, "Fahrt gestartet ...", Toast.LENGTH_LONG).show();
-                    // toast.setGravity(Gravity.TOP|Gravity.LEFT, 0, 0);
                     this.driveStarted = true;
                     this.driveEnded = false;
                     this.lastKmstand = Integer.valueOf(kmstand);
@@ -518,6 +566,17 @@ public class activityStart extends AppCompatActivity {
         timeThread.start();
     }
 
+    private void startLocationThread() {
+        Thread locationThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                startGoogleApiClient();
+            }
+        });
+
+        locationThread.start();
+    }
+
     private void startBluetoothThread() {
         Thread bluetoothThread = new Thread() {
             public void run() {
@@ -600,9 +659,9 @@ public class activityStart extends AppCompatActivity {
                         switch (i) {
                             case 0: { // internet
                                 if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                                    Toast.makeText(this, "permission INTERNET granted", Toast.LENGTH_LONG).show();
+                                    //Toast.makeText(this, "permission INTERNET granted", Toast.LENGTH_LONG).show();
                                 } else {
-                                    Toast.makeText(this, "permission INTERNET _not_ granted", Toast.LENGTH_LONG).show();
+                                    //Toast.makeText(this, "permission INTERNET _not_ granted", Toast.LENGTH_LONG).show();
                                 }
 
                                 break;
@@ -610,9 +669,9 @@ public class activityStart extends AppCompatActivity {
 
                             case 1: { // write external storage
                                 if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                                    Toast.makeText(this, "permission WRITE_EXTERNAL_STORAGE granted", Toast.LENGTH_LONG).show();
+                                    //Toast.makeText(this, "permission WRITE_EXTERNAL_STORAGE granted", Toast.LENGTH_LONG).show();
                                 } else {
-                                    Toast.makeText(this, "permission WRITE_EXTERNAL_STORAGE _not_ granted", Toast.LENGTH_LONG).show();
+                                    //Toast.makeText(this, "permission WRITE_EXTERNAL_STORAGE _not_ granted", Toast.LENGTH_LONG).show();
                                 }
 
                                 break;
@@ -620,9 +679,9 @@ public class activityStart extends AppCompatActivity {
 
                             case 2: { // access fine location
                                 if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                                    Toast.makeText(this, "permission ACCESS_FINE_LOCATION granted", Toast.LENGTH_LONG).show();
+                                    //Toast.makeText(this, "permission ACCESS_FINE_LOCATION granted", Toast.LENGTH_LONG).show();
                                 } else {
-                                    Toast.makeText(this, "permission ACCESS_FINE_LOCATION _not_ granted", Toast.LENGTH_LONG).show();
+                                    //Toast.makeText(this, "permission ACCESS_FINE_LOCATION _not_ granted", Toast.LENGTH_LONG).show();
                                 }
 
                                 break;
@@ -630,9 +689,9 @@ public class activityStart extends AppCompatActivity {
 
                             case 3: { // access coarse location
                                 if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                                    Toast.makeText(this, "permission ACCESS_COARSE_LOCATION granted", Toast.LENGTH_LONG).show();
+                                    //Toast.makeText(this, "permission ACCESS_COARSE_LOCATION granted", Toast.LENGTH_LONG).show();
                                 } else {
-                                    Toast.makeText(this, "permission ACCESS_COARSE_LOCATION _not_ granted", Toast.LENGTH_LONG).show();
+                                    //Toast.makeText(this, "permission ACCESS_COARSE_LOCATION _not_ granted", Toast.LENGTH_LONG).show();
                                 }
 
                                 break;
@@ -651,11 +710,17 @@ public class activityStart extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_activity_start);
 
+        // lifetime
+        this.overrideVoidOnCreateCalled = true;
+
         // set context
         context = this;
 
         // permissions
         this.checkPermissions();
+
+        // gps
+        this.startLocationThread();
 
         // static views
         activityStart.tvLocation = (TextView) findViewById(R.id.tvLocationInfo);
@@ -681,6 +746,10 @@ public class activityStart extends AppCompatActivity {
 
     @Override
     public void onStop() {
+        // app lifetime cycle
+        this.overrideVoidOnStartCalled = false;
+        this.overrideVoidOnCreateCalled = false;
+        this.overrideVoidOnResumeCalled = false;
         this.stopped = true;
         this.stopGoogleApiClient();
 
@@ -689,12 +758,22 @@ public class activityStart extends AppCompatActivity {
 
     @Override
     public void onRestart() {
-        super.onRestart();
+        // app lifetime cycle
+        this.overrideVoidOnStartCalled = false;
+        this.overrideVoidOnCreateCalled = false;
+        this.overrideVoidOnResumeCalled = false;
         this.calledOnRestart = true;
+
+        super.onRestart();
     }
 
     @Override
     public void onPause() {
+        // app lifetime cycle
+        this.overrideVoidOnStartCalled = false;
+        this.overrideVoidOnCreateCalled = false;
+        this.overrideVoidOnResumeCalled = false;
+
         this.paused = true;
         this.stopGoogleApiClient();
 
@@ -711,6 +790,9 @@ public class activityStart extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
+        // app lifetime cycle
+        this.overrideVoidOnResumeCalled = true;
+
         if(this.paused) {
             //this.setAppStatus("paused, resumed");
             this.paused = false;
@@ -724,14 +806,21 @@ public class activityStart extends AppCompatActivity {
             this.start();
         }
 
-        this.startGoogleApiClient();
+        if(!overrideVoidOnCreateCalled) {
+            this.startGoogleApiClient();
+        }
     }
 
     @Override
     public void onStart() {
         super.onStart();
 
-        this.startGoogleApiClient();
+        // app lifetime cycle
+        this.overrideVoidOnStartCalled = true;
+
+        if(!overrideVoidOnCreateCalled) {
+            this.startGoogleApiClient();
+        }
     }
 
     @Override
