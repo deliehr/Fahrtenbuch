@@ -40,7 +40,16 @@ public class activityPOIs extends AppCompatActivity {
 
     private static int mSelectedPosition = -1;
     private static View mPopView = null;
+    private static PopupWindow mPopupWindow = null;
     public void fillListView() {
+        // clear list view
+        ListView listPois = (ListView) findViewById(R.id.listViewPois);
+        try {
+            listPois.removeAllViews();
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
+
         // get pois, add formated result to listview
         List<PointOfInterest> points = PointOfInterest.getPoints(mContext);
         List valueList = new ArrayList<String>();
@@ -51,10 +60,9 @@ public class activityPOIs extends AppCompatActivity {
         }
 
         ListAdapter adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, valueList);
-        ((ListView) findViewById(R.id.listViewPois)).setAdapter(adapter);
+        listPois.setAdapter(adapter);
 
         // listener
-        ListView listPois = (ListView) findViewById(R.id.listViewPois);
         listPois.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -62,11 +70,11 @@ public class activityPOIs extends AppCompatActivity {
 
                 // show popup windows
                 mPopView = getLayoutInflater().inflate(R.layout.popup_poi, null);
-                PopupWindow p = new PopupWindow(mPopView, 500, ViewGroup.LayoutParams.WRAP_CONTENT);
-                p.showAtLocation(view, Gravity.CENTER, 0, 0);
+                mPopupWindow = new PopupWindow(mPopView, 500, ViewGroup.LayoutParams.WRAP_CONTENT);
+                mPopupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
 
                 // set text
-                TextView tvPoi = (TextView) p.getContentView().findViewById(R.id.tvPoiToDelete);
+                TextView tvPoi = (TextView) mPopupWindow.getContentView().findViewById(R.id.tvPoiToDelete);
                 List<PointOfInterest> points = PointOfInterest.getPoints(mContext);
 
                 try {
@@ -78,11 +86,33 @@ public class activityPOIs extends AppCompatActivity {
         });
     }
 
+    // region button handlers
     public void btnClickDeletePoi(View view) {
         if(mSelectedPosition >= 0) {
+            // remove poi
             PointOfInterest.removePoi(mSelectedPosition);
+
+            // close popup window
+            this.closePopupWindow();
+
+            // load new list
+            this.fillListView();
         } else {
             Log.d(TAG, "no selected item");
+        }
+    }
+
+    public void btnClickCancelDeletePoi(View view) {
+        // close popup window
+        this.closePopupWindow();
+    }
+    //endregion
+
+    private void closePopupWindow() {
+        try {
+            mPopupWindow.dismiss();
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
         }
     }
 

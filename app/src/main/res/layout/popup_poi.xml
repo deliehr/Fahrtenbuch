@@ -37,12 +37,33 @@
         android:gravity="center_horizontal"
         android:textColor="#3273f5"/>
 
-    <Button
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Löschen"
-        android:id="@+id/button3"
         android:layout_below="@+id/tvPoiToDelete"
-        android:layout_alignParentStart="true"
-        android:onClick="btnClickDeletePoi"/>
+        android:layout_alignParentStart="true" >
+
+        <Button
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Löschen"
+            android:id="@+id/button4"
+            android:onClick="btnClickDeletePoi"
+            android:layout_below="@+id/tvPoiToDelete"
+            android:textColor="#950D0D"
+            android:textStyle="bold" />
+
+        <Button
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Abbrechen"
+            android:id="@+id/btnCancelDeletePoi"
+            android:onClick="btnClickCancelDeletePoi"
+            android:layout_below="@+id/tvPoiToDelete"
+            android:textColor="#46a632"/>
+    </LinearLayout>
+
 </RelativeLayout>

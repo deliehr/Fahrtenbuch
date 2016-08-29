@@ -136,7 +136,9 @@ public class PointOfInterest {
 
     // region class methods
     public static Boolean removePoi(int index) {
-        return false;
+        Boolean result = false;
+
+        return result;
     }
 
     public static Boolean removePoi(PointOfInterest poi) {
