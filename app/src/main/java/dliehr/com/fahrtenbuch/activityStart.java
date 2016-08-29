@@ -731,6 +731,9 @@ public class activityStart extends AppCompatActivity {
 
         // bluetooth thread
         //this.startBluetoothThread();
+
+        // try the new method
+        PointOfInterest.removePoi(this, 1);
     }
 
     @Override

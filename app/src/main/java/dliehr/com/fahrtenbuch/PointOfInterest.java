@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -135,10 +136,29 @@ public class PointOfInterest {
     // endregion
 
     // region class methods
-    public static Boolean removePoi(int index) {
-        Boolean result = false;
+    public static Boolean removePoi(Context context, int index) {
+        try {
+            JSONObject jsonFile = new JSONObject(getJSONContent(context));
 
-        return result;
+            if(jsonFile.has("points")) {
+                JSONArray points = jsonFile.getJSONArray("points");
+                int countBeforeDelete = points.length();
+
+                points.remove(1);
+
+                if(points.length() < countBeforeDelete) {
+                    // successfully deleted
+                    // save new json_file
+
+                }
+            }
+        } catch (JSONException jsoe) {
+            Log.e(TAG, jsoe.getMessage());
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
+
+        return false;
     }
 
     public static Boolean removePoi(PointOfInterest poi) {

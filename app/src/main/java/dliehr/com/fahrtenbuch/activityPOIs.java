@@ -90,7 +90,11 @@ public class activityPOIs extends AppCompatActivity {
     public void btnClickDeletePoi(View view) {
         if(mSelectedPosition >= 0) {
             // remove poi
-            PointOfInterest.removePoi(mSelectedPosition);
+            if(PointOfInterest.removePoi(this, mSelectedPosition)) {
+                Toast.makeText(this, "POI gelöscht!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Fehler, POI konnte nicht gelöscht werden", Toast.LENGTH_SHORT).show();
+            }
 
             // close popup window
             this.closePopupWindow();
@@ -105,6 +109,8 @@ public class activityPOIs extends AppCompatActivity {
     public void btnClickCancelDeletePoi(View view) {
         // close popup window
         this.closePopupWindow();
+
+        Toast.makeText(this, "Löschen abgebrochen", Toast.LENGTH_SHORT).show();
     }
     //endregion
 
