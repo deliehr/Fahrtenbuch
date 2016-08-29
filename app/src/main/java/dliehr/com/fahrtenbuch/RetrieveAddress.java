@@ -29,7 +29,10 @@ public class RetrieveAddress extends AsyncTask<Location, Void, Void> {
     // app
     private static final String TAG = activityStart.class.getSimpleName();
 
+    // wait for task params
+    private static int sleepTimeWait = 50;
 
+    // class variables
     private static final String LOCATION_API_KEY = "AIzaSyDFfDvQ-h8XaY3ZqDgooEOW38Aj9oEAf5Q";
     private Location location = null;
     private Address address = null;
@@ -60,7 +63,7 @@ public class RetrieveAddress extends AsyncTask<Location, Void, Void> {
     public void waitForTaskFinish() {
         while(!this.backgroundJobDone) {
             try {
-                Thread.sleep(250);
+                Thread.sleep(sleepTimeWait);
             } catch (Exception e) {
             }
         }
