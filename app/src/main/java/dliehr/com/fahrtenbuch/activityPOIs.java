@@ -4,15 +4,25 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +38,8 @@ public class activityPOIs extends AppCompatActivity {
 
     }
 
+    private static int mSelectedPosition = -1;
+    private static View mPopView = null;
     public void fillListView() {
         // get pois, add formated result to listview
         List<PointOfInterest> points = PointOfInterest.getPoints(mContext);
@@ -42,12 +54,36 @@ public class activityPOIs extends AppCompatActivity {
         ((ListView) findViewById(R.id.listViewPois)).setAdapter(adapter);
 
         // listener
-        ((ListView) findViewById(R.id.listViewPois)).setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        ListView listPois = (ListView) findViewById(R.id.listViewPois);
+        listPois.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(mContext, "item id = " + String.valueOf(position), Toast.LENGTH_SHORT).show();
+                mSelectedPosition = position;
+
+                // show popup windows
+                mPopView = getLayoutInflater().inflate(R.layout.popup_poi, null);
+                PopupWindow p = new PopupWindow(mPopView, 500, ViewGroup.LayoutParams.WRAP_CONTENT);
+                p.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+                // set text
+                TextView tvPoi = (TextView) p.getContentView().findViewById(R.id.tvPoiToDelete);
+                List<PointOfInterest> points = PointOfInterest.getPoints(mContext);
+
+                try {
+                    tvPoi.setText(points.get(mSelectedPosition).getFormattedResult());
+                } catch (Exception e) {
+                    Log.e(TAG, e.getMessage());
+                }
             }
         });
+    }
+
+    public void btnClickDeletePoi(View view) {
+        if(mSelectedPosition >= 0) {
+            PointOfInterest.removePoi(mSelectedPosition);
+        } else {
+            Log.d(TAG, "no selected item");
+        }
     }
 
     @Override

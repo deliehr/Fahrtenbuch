@@ -637,8 +637,6 @@ public class activityStart extends AppCompatActivity {
     }
     // endregion
 
-
-
     // region override methods
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {

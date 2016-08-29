@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/popup_poi_background"
+    android:padding="15px">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="52px"
+        android:text="POI löschen"
+        android:id="@+id/textView4"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:gravity="center_horizontal"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Soll der nachfolgende POI wirklich gelöscht werden?"
+        android:id="@+id/textView5"
+        android:layout_below="@+id/textView4"
+        android:layout_alignParentStart="true"
+        android:textColor="#FFFFFF"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="_"
+        android:id="@+id/tvPoiToDelete"
+        android:layout_below="@+id/textView5"
+        android:layout_alignParentStart="true"
+        android:gravity="center_horizontal"
+        android:textColor="#3273f5"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Löschen"
+        android:id="@+id/button3"
+        android:layout_below="@+id/tvPoiToDelete"
+        android:layout_alignParentStart="true"
+        android:onClick="btnClickDeletePoi"/>
+</RelativeLayout>

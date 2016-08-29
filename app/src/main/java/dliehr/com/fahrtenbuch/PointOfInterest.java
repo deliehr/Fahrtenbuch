@@ -36,6 +36,7 @@ public class PointOfInterest {
     String additionalInfo = "";
     Double latitude = 0.0;
     Double longitude = 0.0;
+    Boolean privateDrive = false;
 
     public PointOfInterest() {
     }
@@ -47,6 +48,7 @@ public class PointOfInterest {
     public String getAdditionalInfo() { return this.additionalInfo; }
     public Double getLatitude() { return this.latitude; }
     public Double getLongitude() { return this.longitude; }
+    public Boolean getPrivateDrive() { return this.privateDrive; }
 
     public Address getAddress() {
         Address tmpAddress = new Address(mGermanLocale);
@@ -88,6 +90,7 @@ public class PointOfInterest {
     public void setAdditionalInfo(String additionalInfo) { this.additionalInfo = additionalInfo; }
     public void setLatitude(Double latitude) { this.latitude = latitude; }
     public void setLongitude(Double longitude) { this.longitude = longitude; }
+    public void setPrivateDrive(Boolean privateDrive) { this.privateDrive = privateDrive; }
     // endregion
 
     // region class getter
@@ -132,6 +135,14 @@ public class PointOfInterest {
     // endregion
 
     // region class methods
+    public static Boolean removePoi(int index) {
+        return false;
+    }
+
+    public static Boolean removePoi(PointOfInterest poi) {
+        return false;
+    }
+
     private static String getJSONContent(Context context) {
         InputStream is = context.getResources().openRawResource(R.raw.json_test_file);
         Writer writer = new StringWriter();
