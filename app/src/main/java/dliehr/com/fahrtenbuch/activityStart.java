@@ -521,7 +521,20 @@ public class activityStart extends AppCompatActivity {
     }
 
     public void btnClickAddPoi(View view) {
+        /*
+        Database.getInstance(this).dropTable(Database.T_POI.TABLE_NAME);
+        Database.getInstance(this).createTableT_POI();
 
+        List<PointOfInterest> points = PointOfInterest.getPoints(this);
+
+        for(PointOfInterest poi : points) {
+            if(Database.getInstance(this).insertSingleItemIntoT_POI(poi) >= 0) {
+                Log.i(TAG, "poi eingefügt");
+            } else {
+                Log.i(TAG, "poi nicht eingefügt");
+            }
+        }
+        */
     }
 
     // endregion

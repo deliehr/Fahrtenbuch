@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Database {
+    private static final String TAG = Database.class.getSimpleName();
+
     public static abstract class T_FAHRT implements BaseColumns {
         public static final String TABLE_NAME = "T_FAHRT";
 
@@ -81,13 +83,13 @@ public class Database {
     private static final String SQL_CREATE_TABLE_T_POI =
             "CREATE TABLE " + T_POI.TABLE_NAME + "(" +
                     T_POI._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    T_POI.COL_POSTAL_CODE + " TEXT, " +
+                    T_POI.COL_POSTAL_CODE + " INTEGER, " +
                     T_POI.COL_LOCALITY + " TEXT, " +
                     T_POI.COL_ADDRESS + " TEXT, " +
-                    T_POI.COL_ADDITIONAL_INFO + " TEXT " +
-                    T_POI.COL_LATITUDE + " TEXT, " +
-                    T_POI.COL_LONGITUDE + " TEXT, " +
-                    T_POI.COL_PRIVATE_DRIVE + " TEXT)";
+                    T_POI.COL_ADDITIONAL_INFO + " TEXT, " +
+                    T_POI.COL_LATITUDE + " REAL, " +
+                    T_POI.COL_LONGITUDE + " REAL, " +
+                    T_POI.COL_PRIVATE_DRIVE + " INTEGER)";
 
     private static final String SQL_DROP_TABLE_T_FAHRT = "DROP TABLE IF EXISTS " + T_FAHRT.TABLE_NAME;
 
@@ -283,6 +285,33 @@ public class Database {
         } finally {
             db.close();
         }
+    }
+
+    public long insertSingleItemIntoT_POI(PointOfInterest poi) {
+        FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        long returnNumber = -1;
+
+        try {
+            ContentValues values = new ContentValues();
+
+            values.put(T_POI.COL_POSTAL_CODE, Integer.valueOf(poi.getPostalCode()));
+            values.put(T_POI.COL_LOCALITY, poi.getLocality());
+            values.put(T_POI.COL_ADDRESS, poi.getAddressLine());
+            values.put(T_POI.COL_ADDITIONAL_INFO, poi.getAdditionalInfo());
+            values.put(T_POI.COL_LATITUDE, poi.getLatitude());
+            values.put(T_POI.COL_LONGITUDE, poi.getLongitude());
+            values.put(T_POI.COL_PRIVATE_DRIVE, poi.getPrivateDrive());
+
+            returnNumber = db.insert(T_POI.TABLE_NAME, T_POI.TABLE_NAME, values);
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        } finally {
+            db.close();
+        }
+
+        return returnNumber;
     }
 
     public long insertSingleFieldIntoT_FAHRT(String column, String value) {
