@@ -97,6 +97,8 @@ public class activityStart extends AppCompatActivity {
     static EditText etTimeDateField = null;
     static EditText etKmStand = null;
     static EditText etAdditionalInfo = null;
+    static CheckBox cbPlaceAddress = null;
+    static CheckBox cbAdditionalInfo = null;
 
     // drive
     boolean driveStarted = false;
@@ -206,39 +208,70 @@ public class activityStart extends AppCompatActivity {
     }
 
     static void updateAddressField() {
-        // first, look in cache
         Address currentAddress = null;
 
-        try {
-            currentAddress = findAddressInCache();
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
-        }
-
-        if(currentAddress == null) {
-            RetrieveAddress retrieveAddress = new RetrieveAddress(mLocation);
-            retrieveAddress.execute(mLocation);
-            retrieveAddress.waitForTaskFinish();
-            currentAddress = retrieveAddress.getAddress();
-        } else {
-            Log.i(TAG, "take address from cache");
-        }
-
-        if(currentAddress != null) {
+        // check if checkboxes are checked
+        if(!cbPlaceAddress.isChecked()) {
+            // first, look in cache
             try {
-                etAdressField.setText(currentAddress.getPostalCode() + " " + currentAddress.getLocality() + ", " + currentAddress.getAddressLine(0));
+                currentAddress = findAddressInCache();
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage());
             }
 
-            try {
-                etAdditionalInfo.setText(mPoiFromFoundAddress.getAdditionalInfo());
-            } catch (Exception e) {
-                Log.e(TAG, e.getMessage());
+            if(currentAddress == null) {
+                RetrieveAddress retrieveAddress = new RetrieveAddress(mLocation);
+                retrieveAddress.execute(mLocation);
+                retrieveAddress.waitForTaskFinish();
+                currentAddress = retrieveAddress.getAddress();
+            } else {
+                Log.i(TAG, "take address from cache");
             }
 
-        } else {
-            Log.e(TAG, "void updateAddressField(): currentAddress is null");
+            if(currentAddress != null) {
+                try {
+                    Log.i(TAG, currentAddress.getPostalCode() + " " + currentAddress.getLocality() + ", " + currentAddress.getAddressLine(0));
+                    etAdressField.setText(currentAddress.getPostalCode() + " " + currentAddress.getLocality() + ", " + currentAddress.getAddressLine(0));
+                } catch (Exception e) {
+                    Log.e(TAG, e.getMessage());
+                }
+            } else {
+                Log.e(TAG, "void updateAddressField(): currentAddress is null");
+            }
+        }
+
+        if(!cbAdditionalInfo.isChecked()) {
+            if(currentAddress == null) {
+                // lookup in cache
+                try {
+                    currentAddress = findAddressInCache();
+                } catch (Exception e) {
+                    Log.e(TAG, e.getMessage());
+                }
+
+                // found in cache?
+                if(currentAddress == null) {
+                    RetrieveAddress retrieveAddress = new RetrieveAddress(mLocation);
+                    retrieveAddress.execute(mLocation);
+                    retrieveAddress.waitForTaskFinish();
+                    currentAddress = retrieveAddress.getAddress();
+                } else {
+                    Log.i(TAG, "take address from cache");
+                }
+            }
+
+            // set text
+            if(currentAddress != null) {
+                try {
+                    Log.i(TAG, mPoiFromFoundAddress.getAdditionalInfo());
+                    etAdditionalInfo.setText(mPoiFromFoundAddress.getAdditionalInfo());
+                } catch (Exception e) {
+                    Log.e(TAG, e.getMessage());
+                }
+
+            } else {
+                Log.e(TAG, "void updateAddressField(): currentAddress is null");
+            }
         }
     }
 
@@ -732,6 +765,8 @@ public class activityStart extends AppCompatActivity {
         etAdressField = (EditText) findViewById(R.id.etOrtAdresse);
         etKmStand = (EditText) findViewById(R.id.etKmStand);
         etAdditionalInfo = (EditText) findViewById(R.id.etOrtszusatz);
+        cbPlaceAddress = (CheckBox) findViewById(R.id.cbBlockPlaceAddress);
+        cbAdditionalInfo = (CheckBox) findViewById(R.id.cbBlockAdditionalInfo);
 
         // bluetooth
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
