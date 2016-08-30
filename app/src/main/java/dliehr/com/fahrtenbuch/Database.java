@@ -16,7 +16,7 @@ import java.util.List;
 
 public class Database {
     public static abstract class T_FAHRT implements BaseColumns {
-        public static final String TABLE_NAME = "T_FAHRT";  // int  0
+        public static final String TABLE_NAME = "T_FAHRT";
 
         public static final String COL_START_DATE = "start_date";   // text 1
         public static final String COL_START_TIME = "start_time";   // text 2
@@ -41,7 +41,19 @@ public class Database {
         public static final String COL_END_CAR = "end_car"; // text 20
     }
 
-    private static final String SQL_CREATE_TABLE =
+    public static abstract class T_POI implements BaseColumns {
+        public static final String TABLE_NAME = "T_POI";
+
+        public static final String COL_POSTAL_CODE = "postal_code";   // int 1
+        public static final String COL_LOCALITY = "locality";   // text 2
+        public static final String COL_ADDRESS = "address";   // text 3
+        public static final String COL_ADDITIONAL_INFO = "additional_info"; //text  4
+        public static final String COL_LATITUDE = "latitude"; // real 5
+        public static final String COL_LONGITUDE = "longitude";   // real 6
+        public static final String COL_PRIVATE_DRIVE = "private_drive"; // int 7
+    }
+
+    private static final String SQL_CREATE_TABLE_T_FAHRT =
             "CREATE TABLE " + T_FAHRT.TABLE_NAME + " (" +
                     T_FAHRT._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     T_FAHRT.COL_START_DATE + " TEXT, " +
@@ -66,8 +78,20 @@ public class Database {
                     T_FAHRT.COL_END_PRIVATE_FAHRT + " INTEGER, " +
                     T_FAHRT.COL_END_CAR + " TEXT)";
 
-    private static final String SQL_DELETE_ENTRIES =
-            "DROP TABLE IF EXISTS " + T_FAHRT.TABLE_NAME;
+    private static final String SQL_CREATE_TABLE_T_POI =
+            "CREATE TABLE " + T_POI.TABLE_NAME + "(" +
+                    T_POI._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    T_POI.COL_POSTAL_CODE + " TEXT, " +
+                    T_POI.COL_LOCALITY + " TEXT, " +
+                    T_POI.COL_ADDRESS + " TEXT, " +
+                    T_POI.COL_ADDITIONAL_INFO + " TEXT " +
+                    T_POI.COL_LATITUDE + " TEXT, " +
+                    T_POI.COL_LONGITUDE + " TEXT, " +
+                    T_POI.COL_PRIVATE_DRIVE + " TEXT)";
+
+    private static final String SQL_DROP_TABLE_T_FAHRT = "DROP TABLE IF EXISTS " + T_FAHRT.TABLE_NAME;
+
+    private static final String SQL_DROP_TABLE_T_POI = "DROP TABLE IF EXISTS " + T_POI.TABLE_NAME;
 
     // helper
     public class FahrtenbuchDbHelper extends SQLiteOpenHelper {
@@ -83,7 +107,8 @@ public class Database {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            db.execSQL(SQL_CREATE_TABLE);
+            db.execSQL(SQL_CREATE_TABLE_T_FAHRT);
+            db.execSQL(SQL_CREATE_TABLE_T_POI);
         }
 
         @Override
@@ -109,7 +134,7 @@ public class Database {
         return myInstance;
     }
 
-    public long updateRowWithId(int id, FahrtItem item) {
+    public long updateRowWithIdFromTableT_FAHRT(int id, FahrtItem item) {
         FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
         SQLiteDatabase db = helper.getReadableDatabase();
 
@@ -151,14 +176,31 @@ public class Database {
         }
     }
 
-    public boolean createTable() {
+    public boolean createTableT_FAHRT() {
         boolean returnValue = false;
 
         FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
         SQLiteDatabase db = helper.getReadableDatabase();
 
         try {
-            db.execSQL(SQL_CREATE_TABLE);
+            db.execSQL(SQL_CREATE_TABLE_T_FAHRT);
+            returnValue = true;
+        } catch (Exception exc) {
+        } finally {
+            db.close();
+        }
+
+        return returnValue;
+    }
+
+    public boolean createTableT_POI() {
+        boolean returnValue = false;
+
+        FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
+        SQLiteDatabase db = helper.getReadableDatabase();
+
+        try {
+            db.execSQL(SQL_CREATE_TABLE_T_POI);
             returnValue = true;
         } catch (Exception exc) {
         } finally {
@@ -174,8 +216,8 @@ public class Database {
 
         try {
             ArrayList<FahrtItem> result = new ArrayList<FahrtItem>();
-            Cursor c = db.query(T_FAHRT.TABLE_NAME, new String[]{
-                    T_FAHRT._ID
+            Cursor c = db.query(table, new String[]{
+                    table + "._ID"
             }, null, null, null, null, null);
 
             try {
@@ -203,7 +245,7 @@ public class Database {
         return false;
     }
 
-    public long insertSingleItem(FahrtItem item) {
+    public long insertSingleItemIntoT_FAHRT(FahrtItem item) {
         FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
         SQLiteDatabase db = helper.getWritableDatabase();
 
@@ -243,7 +285,7 @@ public class Database {
         }
     }
 
-    public long insertSingleField(String column, String value) {
+    public long insertSingleFieldIntoT_FAHRT(String column, String value) {
         FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
         SQLiteDatabase db = helper.getWritableDatabase();
 
@@ -278,16 +320,35 @@ public class Database {
     }
     */
 
-    public boolean deleteEntries(String table) {
+    public boolean dropTable(String table) {
         FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
         SQLiteDatabase db = helper.getWritableDatabase();
 
         try {
-            // first delete
-            db.execSQL(Database.SQL_DELETE_ENTRIES);
 
-            // recreate table
-            db.execSQL(Database.SQL_CREATE_TABLE);
+            switch (table) {
+                case T_FAHRT.TABLE_NAME: {
+                    // first delete
+                    db.execSQL(Database.SQL_DROP_TABLE_T_FAHRT);
+
+                    // recreate table
+                    db.execSQL(Database.SQL_CREATE_TABLE_T_FAHRT);
+
+                    break;
+                }
+
+                case T_POI.TABLE_NAME: {
+                    // first delete
+                    db.execSQL(Database.SQL_DROP_TABLE_T_POI);
+
+                    // recreate table
+                    db.execSQL(Database.SQL_CREATE_TABLE_T_POI);
+
+                    break;
+                }
+            }
+
+
             return true;
         } catch (Exception exc) {
             db.close();
@@ -295,7 +356,7 @@ public class Database {
         }
     }
 
-    public List<FahrtItem> getAll() {
+    public List<FahrtItem> getAllFromT_FAHRT() {
         FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
         SQLiteDatabase db = helper.getReadableDatabase();
 

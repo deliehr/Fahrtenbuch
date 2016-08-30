@@ -56,7 +56,8 @@ public class activityDatabase extends AppCompatActivity {
             File backup = SharedCode.createDatabaseBackup(view.getContext());
 
             if(backup != null) {
-                Database.getInstance(view.getContext()).deleteEntries(Database.T_FAHRT.TABLE_NAME);
+                //Database.getInstance(view.getContext()).deleteEntries(Database.T_FAHRT.TABLE_NAME);
+                Database.getInstance(view.getContext()).dropTable(Database.T_FAHRT.TABLE_NAME);
             } else {
                 // no backup
             }
@@ -68,7 +69,7 @@ public class activityDatabase extends AppCompatActivity {
 
     // region other methods
     private void showDataFromTable() {
-        List<FahrtItem> result = Database.getInstance(this).getAll();
+        List<FahrtItem> result = Database.getInstance(this).getAllFromT_FAHRT();
 
         int column = 0;
         for(FahrtItem fi : result) {

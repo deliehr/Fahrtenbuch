@@ -148,7 +148,7 @@ public class activityStart extends AppCompatActivity {
     private void startCheckingActiveDrive() {
         try {
             // check for existing active drive
-            List<FahrtItem> resultItems = Database.getInstance(this).getAll();
+            List<FahrtItem> resultItems = Database.getInstance(this).getAllFromT_FAHRT();
 
             // get last item
             int maxIndex = -1;
@@ -279,7 +279,7 @@ public class activityStart extends AppCompatActivity {
     private void startGetLastData() {
         try {
             // check for existing active drive
-            List<FahrtItem> resultItems = Database.getInstance(this).getAll();
+            List<FahrtItem> resultItems = Database.getInstance(this).getAllFromT_FAHRT();
 
             // get last item
             int maxIndex = -1;
@@ -382,7 +382,7 @@ public class activityStart extends AppCompatActivity {
                 // check if table exists
                 if(!Database.getInstance(this).checkIfTableExists(Database.T_FAHRT.TABLE_NAME)) {
                     // create table first
-                    Database.getInstance(this).createTable();
+                    Database.getInstance(this).createTableT_FAHRT();
                 }
 
                 // change buttons editable
@@ -428,7 +428,9 @@ public class activityStart extends AppCompatActivity {
                 long returnNumber = -1;
 
                 try {
-                    returnNumber = Database.getInstance(this).insertSingleItem(tmpItem);
+                    //returnNumber = Database.getInstance(this).insertSingleItem(tmpItem);
+                    returnNumber = Database.getInstance(this).insertSingleItemIntoT_FAHRT(tmpItem);
+
                     Log.d("info", "return number = " + Long.toString(returnNumber));
 
                     Toast.makeText(activityStart.this, "Fahrt gestartet ...", Toast.LENGTH_LONG).show();
@@ -453,7 +455,7 @@ public class activityStart extends AppCompatActivity {
         if(!kmstand.matches("")) {
             if(Double.valueOf(kmstand) >= this.lastKmstand) {
                 // check last row incomplete
-                List<FahrtItem> resultItems = Database.getInstance(this).getAll();
+                List<FahrtItem> resultItems = Database.getInstance(this).getAllFromT_FAHRT();
 
                 // get max id
                 int maxId = -1;
@@ -495,7 +497,8 @@ public class activityStart extends AppCompatActivity {
                     // update item and db
                     //lastDriveItem.setEndFields(currentDate.format(new Date()), currentTime.format(new Date()), town, address, Double.valueOf(kmstand));
                     lastDriveItem.setEndFields(currentDate.format(new Date()), currentTime.format(new Date()), town, address, Double.valueOf(kmstand), mLocation.getLatitude(), mLocation.getLongitude(), ortszusatz, privateFahrt, car);
-                    long returnId = Database.getInstance(this).updateRowWithId(lastDriveItem.getId(), lastDriveItem);
+                    //long returnId = Database.getInstance(this).updateRowWithId(lastDriveItem.getId(), lastDriveItem);
+                    long returnId = Database.getInstance(this).updateRowWithIdFromTableT_FAHRT(lastDriveItem.getId(), lastDriveItem);
                     Toast.makeText(activityStart.this, "Fahrt beendet ...", Toast.LENGTH_LONG).show();
 
                     // disable button
