@@ -434,6 +434,7 @@ public class activityStart extends AppCompatActivity {
                 SimpleDateFormat currentTime = new SimpleDateFormat("HH:mm:ss");
 
                 // town & adress
+                /*
                 RetrieveAddress retrieveAddress = new RetrieveAddress(mLocation);
                 retrieveAddress.execute(mLocation);
                 retrieveAddress.waitForTaskFinish();
@@ -447,13 +448,15 @@ public class activityStart extends AppCompatActivity {
                 } else {
                     Log.d("error", "void btnClickStartDrive(): currentAddress is null");
                 }
+                */
 
                 try {
                     String ortszusatz = ((EditText) findViewById(R.id.etOrtszusatz)).getText().toString();
                     Boolean privateFahrt = ((CheckBox) findViewById(R.id.cbPrivateFahrt)).isChecked();
                     String car = ((EditText) findViewById(R.id.etCar)).getText().toString();
 
-                    tmpItem.setStartFields(currentDate.format(new Date()), currentTime.format(new Date()), town, address, Double.valueOf(kmstand), mLocation.getLatitude(), mLocation.getLongitude(), ortszusatz, privateFahrt, car);
+                    //tmpItem.setStartFields(currentDate.format(new Date()), currentTime.format(new Date()), town, address, Double.valueOf(kmstand), mLocation.getLatitude(), mLocation.getLongitude(), ortszusatz, privateFahrt, car);
+                    tmpItem.setStartFields(currentDate.format(new Date()), currentTime.format(new Date()), ((EditText) findViewById(R.id.etOrtAdresse)).getText().toString(), ((EditText) findViewById(R.id.etOrtszusatz)).getText().toString(), Double.valueOf(kmstand), mLocation.getLatitude(), mLocation.getLongitude(), ortszusatz, privateFahrt, car);
                 } catch (Exception exc) {
                     Log.d("error", exc.getMessage());
                 }
@@ -508,6 +511,7 @@ public class activityStart extends AppCompatActivity {
                 SimpleDateFormat currentTime = new SimpleDateFormat("HH:mm:ss");
 
                 // town & adress
+                /*
                 RetrieveAddress retrieveAddress = new RetrieveAddress(mLocation);
                 retrieveAddress.execute(mLocation);
                 retrieveAddress.waitForTaskFinish();
@@ -521,6 +525,7 @@ public class activityStart extends AppCompatActivity {
                 } else {
                     Log.d("error", "void btnClickStartDrive(): currentAddress is null");
                 }
+                */
 
                 String ortszusatz = ((EditText) findViewById(R.id.etOrtszusatz)).getText().toString();
                 Boolean privateFahrt = ((CheckBox) findViewById(R.id.cbPrivateFahrt)).isChecked();
@@ -529,7 +534,8 @@ public class activityStart extends AppCompatActivity {
                 try {
                     // update item and db
                     //lastDriveItem.setEndFields(currentDate.format(new Date()), currentTime.format(new Date()), town, address, Double.valueOf(kmstand));
-                    lastDriveItem.setEndFields(currentDate.format(new Date()), currentTime.format(new Date()), town, address, Double.valueOf(kmstand), mLocation.getLatitude(), mLocation.getLongitude(), ortszusatz, privateFahrt, car);
+                    //lastDriveItem.setEndFields(currentDate.format(new Date()), currentTime.format(new Date()), town, address, Double.valueOf(kmstand), mLocation.getLatitude(), mLocation.getLongitude(), ortszusatz, privateFahrt, car);
+                    lastDriveItem.setEndFields(currentDate.format(new Date()), currentTime.format(new Date()), ((EditText) findViewById(R.id.etOrtAdresse)).getText().toString(), ((EditText) findViewById(R.id.etOrtszusatz)).getText().toString(), Double.valueOf(kmstand), mLocation.getLatitude(), mLocation.getLongitude(), ortszusatz, privateFahrt, car);
                     //long returnId = Database.getInstance(this).updateRowWithId(lastDriveItem.getId(), lastDriveItem);
                     long returnId = Database.getInstance(this).updateRowWithIdFromTableT_FAHRT(lastDriveItem.getId(), lastDriveItem);
                     Toast.makeText(activityStart.this, "Fahrt beendet ...", Toast.LENGTH_LONG).show();
