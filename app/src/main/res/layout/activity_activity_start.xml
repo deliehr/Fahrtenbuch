@@ -47,11 +47,13 @@
                 android:layout_column="0" />
 
             <EditText
-                android:layout_width="150px"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/etDatumUhrzeit"
                 android:layout_column="1"
-                android:inputType="textNoSuggestions|textMultiLine"/>
+                android:inputType="textNoSuggestions|textMultiLine"
+                android:layout_span="2"
+                android:layout_weight="1"/>
         </TableRow>
 
         <TableRow
@@ -69,11 +71,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="textMultiLine|textNoSuggestions"
-                android:ems="10"
                 android:id="@+id/etOrtAdresse"
-                android:layout_below="@+id/tableLayout"
-                android:layout_centerHorizontal="true"
-                android:layout_column="1" />
+                android:layout_column="1"
+                android:layout_weight="1"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
@@ -98,11 +98,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="textNoSuggestions"
-                android:ems="10"
                 android:id="@+id/etOrtszusatz"
-                android:layout_below="@+id/tableLayout"
-                android:layout_centerHorizontal="true"
-                android:layout_column="1" />
+                android:layout_column="1"
+                android:layout_weight="1"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
@@ -126,7 +124,9 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/etKmStand"
                 android:layout_column="1"
-                android:inputType="number|textNoSuggestions"/>
+                android:inputType="number|textNoSuggestions"
+                android:layout_span="2"
+                android:layout_weight="1"/>
         </TableRow>
 
         <TableRow
@@ -143,7 +143,9 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/etCar"
                 android:layout_column="1"
-                android:inputType="textNoSuggestions"/>
+                android:inputType="textNoSuggestions"
+                android:layout_span="2"
+                android:layout_weight="1"/>
         </TableRow>
 
         <TableRow
