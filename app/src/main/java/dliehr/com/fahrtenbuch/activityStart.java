@@ -28,6 +28,8 @@ import java.util.*;
 // name: server_key_fahrtenbuch
 // key: AIzaSyDFfDvQ-h8XaY3ZqDgooEOW38Aj9oEAf5Q
 
+// from another mac os systems :-)
+
 public class activityStart extends AppCompatActivity {
     // app
     private static final String TAG = activityStart.class.getSimpleName();
