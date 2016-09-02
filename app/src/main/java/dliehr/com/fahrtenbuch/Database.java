@@ -333,22 +333,6 @@ public class Database {
         }
     }
 
-    /*
-    public long insertList(ArrayList<String> params) {
-        FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
-        SQLiteDatabase db = helper.getWritableDatabase();
-
-        try {
-            ContentValues values = new ContentValues();
-            values.put(T_FAHRT.COL_START_ADDRESS, "x");
-
-            return db.insert(T_FAHRT.TABLE_NAME, T_FAHRT.TABLE_NAME, values);
-        } finally {
-            db.close();
-        }
-    }
-    */
-
     public boolean dropTable(String table) {
         FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
         SQLiteDatabase db = helper.getWritableDatabase();

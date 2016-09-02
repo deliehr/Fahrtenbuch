@@ -99,6 +99,7 @@ public class activityStart extends AppCompatActivity {
     static EditText etTimeDateField = null;
     static EditText etKmStand = null;
     static EditText etAdditionalInfo = null;
+    static CheckBox cbPrivateDrive = null;
     static CheckBox cbPlaceAddress = null;
     static CheckBox cbAdditionalInfo = null;
 
@@ -562,20 +563,51 @@ public class activityStart extends AppCompatActivity {
     }
 
     public void btnClickAddPoi(View view) {
-        /*
-        Database.getInstance(this).dropTable(Database.T_POI.TABLE_NAME);
-        Database.getInstance(this).createTableT_POI();
+        // add new poi
+        // need: location, place address, additional information, private drive
+        if(mLocation != null) {
+            String addressLine = etAdressField.getText().toString();
+            String additionalInfo = etAdditionalInfo.getText().toString();
+            Boolean privateDrive = cbPrivateDrive.isChecked();
 
-        List<PointOfInterest> points = PointOfInterest.getPoints(this);
+            if(!addressLine.matches("") && !additionalInfo.matches("")) {
+                // all information present, insert in db
+                String locality = null;
+                String postalCode = null;
 
-        for(PointOfInterest poi : points) {
-            if(Database.getInstance(this).insertSingleItemIntoT_POI(poi) >= 0) {
-                Log.i(TAG, "poi eingefügt");
+                try {
+                    locality = addressLine.split(",")[0].split(" ")[1];
+                    postalCode = addressLine.split(",")[0].split(" ")[0];
+                } catch (Exception e) {
+                    Toast.makeText(this, "Error, POI not inserted! (" + e.getMessage() + ")", Toast.LENGTH_LONG).show();
+
+                    locality = "";
+                    postalCode = "";
+                }
+
+                try {
+                    PointOfInterest tmpPoi = new PointOfInterest();
+                    tmpPoi.setLatitude(mLocation.getLatitude());
+                    tmpPoi.setLongitude(mLocation.getLongitude());
+                    tmpPoi.setAddressLine(addressLine);
+                    tmpPoi.setAdditionalInfo(additionalInfo);
+                    tmpPoi.setPrivateDrive(privateDrive);
+                    tmpPoi.setLocality(locality);
+                    tmpPoi.setPostalCode(postalCode);
+
+                    Database.getInstance(this).insertSingleItemIntoT_POI(tmpPoi);
+
+                    Toast.makeText(this, "Point of interest eingefügt!", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    Log.e(TAG, e.getMessage());
+                    Toast.makeText(this, "Error, POI not inserted! (" + e.getMessage() + ")", Toast.LENGTH_LONG).show();
+                }
             } else {
-                Log.i(TAG, "poi nicht eingefügt");
+                Toast.makeText(this, "Bitte Adresse und Ortszusatz angeben!", Toast.LENGTH_SHORT).show();
             }
+        } else {
+            Toast.makeText(this, "Location not available", Toast.LENGTH_SHORT).show();
         }
-        */
     }
 
     // endregion
@@ -775,6 +807,7 @@ public class activityStart extends AppCompatActivity {
         etAdditionalInfo = (EditText) findViewById(R.id.etOrtszusatz);
         cbPlaceAddress = (CheckBox) findViewById(R.id.cbBlockPlaceAddress);
         cbAdditionalInfo = (CheckBox) findViewById(R.id.cbBlockAdditionalInfo);
+        cbPrivateDrive = (CheckBox) findViewById(R.id.cbPrivateFahrt);
 
         // bluetooth
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
