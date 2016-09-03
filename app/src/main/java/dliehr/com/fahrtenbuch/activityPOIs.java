@@ -52,6 +52,11 @@ public class activityPOIs extends AppCompatActivity {
 
         // get pois, add formated result to listview
         List<PointOfInterest> points = PointOfInterest.getPoints(mContext);
+
+        if(!(points.size() > 0)) {
+            return;
+        }
+
         List valueList = new ArrayList<String>();
 
         for(PointOfInterest poi : points) {

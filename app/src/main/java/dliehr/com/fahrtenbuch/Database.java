@@ -127,7 +127,6 @@ public class Database {
     }
     public String databasePath = "";
 
-    // access
     public static Database getInstance(Context context) {
         if(myInstance == null) {
             myInstance = new Database(context);
@@ -136,6 +135,109 @@ public class Database {
         return myInstance;
     }
 
+    // region general functionality
+    public boolean checkIfTableIsEmpty(String table) {
+        FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
+        SQLiteDatabase db = helper.getReadableDatabase();
+
+        try {
+            List<Integer> result = new ArrayList<Integer>();
+            Cursor c = db.query(table, new String[]{
+                    table + "._ID"
+            }, null, null, null, null, null);
+
+            try {
+                while(c.moveToNext()) {
+                    result.add(c.getInt(0));
+                }
+
+                c.close();
+
+                if(result.size() > 0) {
+                    return false;
+                }
+            } finally {
+                c.close();
+            }
+        } catch (Exception exc) {
+
+        } finally {
+            db.close();
+        }
+
+        return true;
+    }
+
+    public boolean checkIfTableExists(String table) {
+        FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
+        SQLiteDatabase db = helper.getReadableDatabase();
+
+        try {
+            List<Integer> result = new ArrayList<Integer>();
+            Cursor c = db.query(table, new String[]{
+                    table + "._ID"
+            }, null, null, null, null, null);
+
+            try {
+                while(c.moveToNext()) {
+                    result.add(c.getInt(0));
+                }
+
+                c.close();
+
+                if(result.size() > 0) {
+                    return true;
+                }
+            } finally {
+                c.close();
+            }
+        } catch (Exception exc) {
+
+        } finally {
+            db.close();
+        }
+
+        return false;
+    }
+
+    public boolean dropTable(String table) {
+        FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        try {
+
+            switch (table) {
+                case T_FAHRT.TABLE_NAME: {
+                    // first delete
+                    db.execSQL(Database.SQL_DROP_TABLE_T_FAHRT);
+
+                    // recreate table
+                    db.execSQL(Database.SQL_CREATE_TABLE_T_FAHRT);
+
+                    break;
+                }
+
+                case T_POI.TABLE_NAME: {
+                    // first delete
+                    db.execSQL(Database.SQL_DROP_TABLE_T_POI);
+
+                    // recreate table
+                    db.execSQL(Database.SQL_CREATE_TABLE_T_POI);
+
+                    break;
+                }
+            }
+
+
+            return true;
+        } catch (Exception exc) {
+            db.close();
+            return false;
+        }
+    }
+    // endregion
+
+    // region table t_fahrt
     public long updateRowWithIdFromTableT_FAHRT(int id, FahrtItem item) {
         FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
         SQLiteDatabase db = helper.getReadableDatabase();
@@ -195,58 +297,6 @@ public class Database {
         return returnValue;
     }
 
-    public boolean createTableT_POI() {
-        boolean returnValue = false;
-
-        FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
-        SQLiteDatabase db = helper.getReadableDatabase();
-
-        try {
-            db.execSQL(SQL_CREATE_TABLE_T_POI);
-            returnValue = true;
-        } catch (Exception exc) {
-        } finally {
-            db.close();
-        }
-
-        return returnValue;
-    }
-
-    public boolean checkIfTableExists(String table) {
-        FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
-        SQLiteDatabase db = helper.getReadableDatabase();
-
-        try {
-            ArrayList<FahrtItem> result = new ArrayList<FahrtItem>();
-            Cursor c = db.query(table, new String[]{
-                    table + "._ID"
-            }, null, null, null, null, null);
-
-            try {
-                while(c.moveToNext()) {
-                    FahrtItem tmpItem = new FahrtItem();
-                    tmpItem.setId(c.getInt(0));
-
-                    result.add(tmpItem);
-                }
-
-                c.close();
-
-                if(result.size() > 0) {
-                    return true;
-                }
-            } finally {
-                c.close();
-            }
-        } catch (Exception exc) {
-
-        } finally {
-            db.close();
-        }
-
-        return false;
-    }
-
     public long insertSingleItemIntoT_FAHRT(FahrtItem item) {
         FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
         SQLiteDatabase db = helper.getWritableDatabase();
@@ -287,33 +337,6 @@ public class Database {
         }
     }
 
-    public long insertSingleItemIntoT_POI(PointOfInterest poi) {
-        FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
-        SQLiteDatabase db = helper.getWritableDatabase();
-
-        long returnNumber = -1;
-
-        try {
-            ContentValues values = new ContentValues();
-
-            values.put(T_POI.COL_POSTAL_CODE, Integer.valueOf(poi.getPostalCode()));
-            values.put(T_POI.COL_LOCALITY, poi.getLocality());
-            values.put(T_POI.COL_ADDRESS, poi.getAddressLine());
-            values.put(T_POI.COL_ADDITIONAL_INFO, poi.getAdditionalInfo());
-            values.put(T_POI.COL_LATITUDE, poi.getLatitude());
-            values.put(T_POI.COL_LONGITUDE, poi.getLongitude());
-            values.put(T_POI.COL_PRIVATE_DRIVE, poi.getPrivateDrive());
-
-            returnNumber = db.insert(T_POI.TABLE_NAME, T_POI.TABLE_NAME, values);
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
-        } finally {
-            db.close();
-        }
-
-        return returnNumber;
-    }
-
     public long insertSingleFieldIntoT_FAHRT(String column, String value) {
         FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
         SQLiteDatabase db = helper.getWritableDatabase();
@@ -330,42 +353,6 @@ public class Database {
             return -1;
         } finally {
             db.close();
-        }
-    }
-
-    public boolean dropTable(String table) {
-        FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
-        SQLiteDatabase db = helper.getWritableDatabase();
-
-        try {
-
-            switch (table) {
-                case T_FAHRT.TABLE_NAME: {
-                    // first delete
-                    db.execSQL(Database.SQL_DROP_TABLE_T_FAHRT);
-
-                    // recreate table
-                    db.execSQL(Database.SQL_CREATE_TABLE_T_FAHRT);
-
-                    break;
-                }
-
-                case T_POI.TABLE_NAME: {
-                    // first delete
-                    db.execSQL(Database.SQL_DROP_TABLE_T_POI);
-
-                    // recreate table
-                    db.execSQL(Database.SQL_CREATE_TABLE_T_POI);
-
-                    break;
-                }
-            }
-
-
-            return true;
-        } catch (Exception exc) {
-            db.close();
-            return false;
         }
     }
 
@@ -429,4 +416,120 @@ public class Database {
 
 
     }
+    // endregion
+
+    // region table t_poi
+
+    public boolean createTableT_POI() {
+        boolean returnValue = false;
+
+        FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
+        SQLiteDatabase db = helper.getReadableDatabase();
+
+        try {
+            db.execSQL(SQL_CREATE_TABLE_T_POI);
+            returnValue = true;
+        } catch (Exception exc) {
+            returnValue = false;
+        } finally {
+            db.close();
+        }
+
+        return returnValue;
+    }
+
+    public long insertSingleItemIntoT_POI(PointOfInterest poi) {
+        FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        long returnNumber = -1;
+
+        try {
+            ContentValues values = new ContentValues();
+
+            values.put(T_POI.COL_POSTAL_CODE, Integer.valueOf(poi.getPostalCode()));
+            values.put(T_POI.COL_LOCALITY, poi.getLocality());
+            values.put(T_POI.COL_ADDRESS, poi.getAddressLine());
+            values.put(T_POI.COL_ADDITIONAL_INFO, poi.getAdditionalInfo());
+            values.put(T_POI.COL_LATITUDE, poi.getLatitude());
+            values.put(T_POI.COL_LONGITUDE, poi.getLongitude());
+            values.put(T_POI.COL_PRIVATE_DRIVE, poi.getPrivateDrive());
+
+            returnNumber = db.insert(T_POI.TABLE_NAME, T_POI.TABLE_NAME, values);
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        } finally {
+            db.close();
+        }
+
+        return returnNumber;
+    }
+
+    public boolean removePoiFromT_POI(int index) {
+        boolean success = false;
+
+        FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
+        SQLiteDatabase db = helper.getReadableDatabase();
+
+        try {
+            String sql = "REMOVE FROM " + T_POI.TABLE_NAME + " WHERE " + T_POI._ID + " = " + index;
+            db.execSQL(sql);
+
+            success = true;
+        } catch (Exception e) {
+
+        } finally {
+            db.close();
+        }
+
+        return success;
+    }
+
+    public List<PointOfInterest> getAllFromT_POI() {
+        FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
+        SQLiteDatabase db = helper.getReadableDatabase();
+
+        ArrayList<PointOfInterest> result = null;
+
+        try {
+            result = new ArrayList<PointOfInterest>();
+            Cursor c = db.query(T_POI.TABLE_NAME, new String[]{
+                    T_POI._ID,
+                    T_POI.COL_ADDRESS,
+                    T_POI.COL_ADDITIONAL_INFO,
+                    T_POI.COL_POSTAL_CODE,
+                    T_POI.COL_LOCALITY,
+                    T_POI.COL_LATITUDE,
+                    T_POI.COL_LONGITUDE,
+                    T_POI.COL_PRIVATE_DRIVE
+            }, null, null, null, null, null);
+
+            try {
+                while(c.moveToNext()) {
+                    PointOfInterest tmpItem = new PointOfInterest();
+                    tmpItem.setPostalCode(c.getString(1));
+                    tmpItem.setLocality(c.getString(2));
+                    tmpItem.setAddressLine(c.getString(3));
+                    tmpItem.setAdditionalInfo(c.getString(4));
+                    tmpItem.setLatitude(c.getDouble(5));
+                    tmpItem.setLongitude(c.getDouble(6));
+                    tmpItem.setPrivateDrive((c.getInt(7)) == 1);
+
+                    result.add(tmpItem);
+                }
+            } catch (Exception e) {
+                result = null;
+            } finally {
+                c.close();
+            }
+        }catch (Exception e) {
+            result = null;
+        } finally {
+            db.close();
+        }
+
+        return result;
+    }
+
+    // endregion
 }

@@ -95,7 +95,7 @@ public class PointOfInterest {
     // endregion
 
     // region class getter
-    public static List<PointOfInterest> getPoints(Context context) {
+    public static List<PointOfInterest> getPointsFromJSONRawSource(Context context) {
         List<PointOfInterest> tmpPoints = new ArrayList<PointOfInterest>();
 
         // this.address.setLocality(new String(component.getString("long_name").getBytes("ISO-8859-1"), "UTF-8"));
@@ -132,6 +132,30 @@ public class PointOfInterest {
         }
 
         return tmpPoints;
+    }
+
+    public static List<PointOfInterest> getPoints(Context context) {
+        // check if table t_poi exists
+        try {
+            Database.getInstance(context).createTableT_POI();
+        } catch (Exception e) {
+
+        }
+
+        // check if table empty
+        if(Database.getInstance(context).checkIfTableIsEmpty(Database.T_POI.TABLE_NAME)) {
+            // table empty, read from json file
+            List<PointOfInterest> jsonList = getPointsFromJSONRawSource(context);
+
+            for(PointOfInterest poi : jsonList) {
+                Log.i(TAG, String.valueOf(Database.getInstance(context).insertSingleItemIntoT_POI(poi)));
+            }
+        } else {
+            // table not empty
+            // do nothing
+        }
+
+        return Database.getInstance(context).getAllFromT_POI();
     }
     // endregion
 
