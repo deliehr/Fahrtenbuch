@@ -27,7 +27,7 @@ import java.util.Locale;
 
 public class RetrieveAddress extends AsyncTask<Location, Void, Void> {
     // app
-    private static final String TAG = activityStart.class.getSimpleName();
+    private static final String TAG = RetrieveAddress.class.getSimpleName();
 
     // wait for task params
     private static int sleepTimeWait = 50;
@@ -133,7 +133,7 @@ public class RetrieveAddress extends AsyncTask<Location, Void, Void> {
                                 JSONArray types = component.getJSONArray("types");
 
                                 for( int j = 0 ; j < types.length() ; j ++ ){
-                                    if( types.getString(j).equals("locality") ){
+                                    if(types.getString(j).equals("locality") ){
                                         this.address.setLocality(new String(component.getString("long_name").getBytes("ISO-8859-1"), "UTF-8"));
                                     }
 

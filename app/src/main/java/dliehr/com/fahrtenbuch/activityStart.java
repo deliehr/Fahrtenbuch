@@ -20,7 +20,18 @@ import com.github.pires.obd.commands.engine.*;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.*;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -95,9 +106,9 @@ public class activityStart extends AppCompatActivity {
 
     // static views
     static TextView tvLocation = null;
-    static EditText etAdressField = null;
+    static EditText etPlaceAddress = null;
     static EditText etTimeDateField = null;
-    static EditText etKmStand = null;
+    static EditText etKilometers = null;
     static EditText etAdditionalInfo = null;
     static CheckBox cbPrivateDrive = null;
     static CheckBox cbPlaceAddress = null;
@@ -179,7 +190,7 @@ public class activityStart extends AppCompatActivity {
                 // last km
                 //this.lastKmstand = Integer.valueOf(lastFahrtItem.getStartKmstand());
                 this.lastKmstand = lastFahrtItem.getStartKmstand();
-                ((EditText) findViewById(R.id.etKmStand)).setText(String.valueOf(this.lastKmstand));
+                ((EditText) findViewById(R.id.etKilometers)).setText(String.valueOf(this.lastKmstand));
             } else {
                 // no last drive existing
                 Log.d("warning", Errors.warning_checking_on_start_for_existing_drive.getErrorText());
@@ -233,8 +244,12 @@ public class activityStart extends AppCompatActivity {
 
             if(currentAddress != null) {
                 try {
-                    Log.i(TAG, currentAddress.getPostalCode() + " " + currentAddress.getLocality() + ", " + currentAddress.getAddressLine(0));
-                    etAdressField.setText(currentAddress.getPostalCode() + " " + currentAddress.getLocality() + ", " + currentAddress.getAddressLine(0));
+                    String placeAddressToSet = currentAddress.getPostalCode()
+                            + " " + currentAddress.getLocality() +
+                            ", " + currentAddress.getAddressLine(0);
+                    Log.i(TAG, placeAddressToSet);
+
+                    etPlaceAddress.setText(placeAddressToSet);
                 } catch (Exception e) {
                     Log.e(TAG, e.getMessage());
                 }
@@ -332,11 +347,11 @@ public class activityStart extends AppCompatActivity {
                 if(lastFahrtItem != null) {
                     // last kmstand
                     if(lastFahrtItem.getEndKmstand() != null) {
-                        ((EditText) findViewById(R.id.etKmStand)).setText(String.valueOf(lastFahrtItem.getEndKmstand()));
+                        ((EditText) findViewById(R.id.etKilometers)).setText(String.valueOf(lastFahrtItem.getEndKmstand()));
                     } else {
                         // try start km stand
                         if(lastFahrtItem.getStartKmstand() != null) {
-                            ((EditText) findViewById(R.id.etKmStand)).setText(String.valueOf(lastFahrtItem.getStartKmstand()));
+                            ((EditText) findViewById(R.id.etKilometers)).setText(String.valueOf(lastFahrtItem.getStartKmstand()));
                         } else {
                             //
                         }
@@ -411,7 +426,7 @@ public class activityStart extends AppCompatActivity {
     public void btnClickStartDrive(View view) {
         // start drive
         // check km stand
-        String kmstand = ((EditText) findViewById(R.id.etKmStand)).getText().toString();
+        String kmstand = ((EditText) findViewById(R.id.etKilometers)).getText().toString();
 
         if(!kmstand.matches("")) {
             if(Double.valueOf(kmstand) >= this.lastKmstand) {
@@ -437,29 +452,23 @@ public class activityStart extends AppCompatActivity {
                 SimpleDateFormat currentTime = new SimpleDateFormat("HH:mm:ss");
 
                 // town & adress
-                /*
-                RetrieveAddress retrieveAddress = new RetrieveAddress(mLocation);
-                retrieveAddress.execute(mLocation);
-                retrieveAddress.waitForTaskFinish();
-                Address currentAddress = retrieveAddress.getAddress();
-                String address = "";
-                String town = "";
-
-                if(currentAddress != null) {
-                    address = currentAddress.getAddressLine(0);
-                    town = currentAddress.getPostalCode() + "," + currentAddress.getLocality();
-                } else {
-                    Log.d("error", "void btnClickStartDrive(): currentAddress is null");
-                }
-                */
-
                 try {
-                    String ortszusatz = ((EditText) findViewById(R.id.etOrtszusatz)).getText().toString();
-                    Boolean privateFahrt = ((CheckBox) findViewById(R.id.cbPrivateFahrt)).isChecked();
+                    String additionalInfo = ((EditText) findViewById(R.id.etAdditionalInfo)).getText().toString();
+                    Boolean privateDrive = ((CheckBox) findViewById(R.id.cbPrivateDrive)).isChecked();
                     String car = ((EditText) findViewById(R.id.etCar)).getText().toString();
 
-                    //tmpItem.setStartFields(currentDate.format(new Date()), currentTime.format(new Date()), town, address, Double.valueOf(kmstand), mLocation.getLatitude(), mLocation.getLongitude(), ortszusatz, privateFahrt, car);
-                    tmpItem.setStartFields(currentDate.format(new Date()), currentTime.format(new Date()), ((EditText) findViewById(R.id.etOrtAdresse)).getText().toString(), ((EditText) findViewById(R.id.etOrtszusatz)).getText().toString(), Double.valueOf(kmstand), mLocation.getLatitude(), mLocation.getLongitude(), ortszusatz, privateFahrt, car);
+                    tmpItem.setStartFields(
+                            currentDate.format(new Date()),
+                            currentTime.format(new Date()),
+                            "start town",
+                            "address",
+                            Double.valueOf(kmstand),
+                            mLocation.getLatitude(),
+                            mLocation.getLongitude(),
+                            additionalInfo,
+                            privateDrive,
+                            car
+                    );
                 } catch (Exception exc) {
                     Log.d("error", exc.getMessage());
                 }
@@ -467,7 +476,6 @@ public class activityStart extends AppCompatActivity {
                 long returnNumber = -1;
 
                 try {
-                    //returnNumber = Database.getInstance(this).insertSingleItem(tmpItem);
                     returnNumber = Database.getInstance(this).insertSingleItemIntoT_FAHRT(tmpItem);
 
                     Log.d("info", "return number = " + Long.toString(returnNumber));
@@ -489,7 +497,7 @@ public class activityStart extends AppCompatActivity {
     }
 
     public void btnClickEndDrive(View view) {
-        String kmstand = ((EditText) findViewById(R.id.etKmStand)).getText().toString();
+        String kmstand = ((EditText) findViewById(R.id.etKilometers)).getText().toString();
 
         if(!kmstand.matches("")) {
             if(Double.valueOf(kmstand) >= this.lastKmstand) {
@@ -530,20 +538,20 @@ public class activityStart extends AppCompatActivity {
                 }
                 */
 
-                String ortszusatz = ((EditText) findViewById(R.id.etOrtszusatz)).getText().toString();
-                Boolean privateFahrt = ((CheckBox) findViewById(R.id.cbPrivateFahrt)).isChecked();
+                String ortszusatz = ((EditText) findViewById(R.id.etAdditionalInfo)).getText().toString();
+                Boolean privateFahrt = ((CheckBox) findViewById(R.id.cbPrivateDrive)).isChecked();
                 String car = ((EditText) findViewById(R.id.etCar)).getText().toString();
 
                 try {
                     // update item and db
                     //lastDriveItem.setEndFields(currentDate.format(new Date()), currentTime.format(new Date()), town, address, Double.valueOf(kmstand));
                     //lastDriveItem.setEndFields(currentDate.format(new Date()), currentTime.format(new Date()), town, address, Double.valueOf(kmstand), mLocation.getLatitude(), mLocation.getLongitude(), ortszusatz, privateFahrt, car);
-                    lastDriveItem.setEndFields(currentDate.format(new Date()), currentTime.format(new Date()), ((EditText) findViewById(R.id.etOrtAdresse)).getText().toString(), ((EditText) findViewById(R.id.etOrtszusatz)).getText().toString(), Double.valueOf(kmstand), mLocation.getLatitude(), mLocation.getLongitude(), ortszusatz, privateFahrt, car);
+                    lastDriveItem.setEndFields(currentDate.format(new Date()), currentTime.format(new Date()), ((EditText) findViewById(R.id.etPlaceAddress)).getText().toString(), ((EditText) findViewById(R.id.etAdditionalInfo)).getText().toString(), Double.valueOf(kmstand), mLocation.getLatitude(), mLocation.getLongitude(), ortszusatz, privateFahrt, car);
                     //long returnId = Database.getInstance(this).updateRowWithId(lastDriveItem.getId(), lastDriveItem);
                     long returnId = Database.getInstance(this).updateRowWithIdFromTableT_FAHRT(lastDriveItem.getId(), lastDriveItem);
                     Toast.makeText(activityStart.this, "Fahrt beendet ...", Toast.LENGTH_LONG).show();
 
-                    // disable button
+                    // disable / enable button
                     ((Button) findViewById(R.id.btnEndDrive)).setEnabled(false);
                     ((Button) findViewById(R.id.btnStartDrive)).setEnabled(true);
 
@@ -560,13 +568,35 @@ public class activityStart extends AppCompatActivity {
         } else {
             Toast.makeText(activityStart.this, "KM Stand eingeben!", Toast.LENGTH_LONG).show();
         }
+
+        // send last drive to webserver
+        this.sendLastRowToServer();
+    }
+
+    // debug
+    public void btnClickTest(View view) {
+        // debug
+        this.sendLastRowToServer();
+    }
+
+    private void sendLastRowToServer() {
+        FahrtItem lastDrive = Database.getInstance(this).getLastDrive();
+
+        SendDriveToServer send = new SendDriveToServer(lastDrive);
+        send.execute();
+
+        if(send.isBackgroundJobDone()) {
+            Log.i(TAG, "erfolg");
+        } else {
+            Log.i(TAG, "fehler");
+        }
     }
 
     public void btnClickAddPoi(View view) {
         // add new poi
         // need: location, place address, additional information, private drive
         if(mLocation != null) {
-            String addressLine = etAdressField.getText().toString();
+            String addressLine = etPlaceAddress.getText().toString();
             String additionalInfo = etAdditionalInfo.getText().toString();
             Boolean privateDrive = cbPrivateDrive.isChecked();
 
@@ -801,13 +831,13 @@ public class activityStart extends AppCompatActivity {
 
         // static views
         tvLocation = (TextView) findViewById(R.id.tvLocationInfo);
-        etTimeDateField = (EditText) findViewById(R.id.etDatumUhrzeit);
-        etAdressField = (EditText) findViewById(R.id.etOrtAdresse);
-        etKmStand = (EditText) findViewById(R.id.etKmStand);
-        etAdditionalInfo = (EditText) findViewById(R.id.etOrtszusatz);
+        etTimeDateField = (EditText) findViewById(R.id.etDateTime);
+        etPlaceAddress = (EditText) findViewById(R.id.etPlaceAddress);
+        etKilometers = (EditText) findViewById(R.id.etKilometers);
+        etAdditionalInfo = (EditText) findViewById(R.id.etAdditionalInfo);
         cbPlaceAddress = (CheckBox) findViewById(R.id.cbBlockPlaceAddress);
         cbAdditionalInfo = (CheckBox) findViewById(R.id.cbBlockAdditionalInfo);
-        cbPrivateDrive = (CheckBox) findViewById(R.id.cbPrivateFahrt);
+        cbPrivateDrive = (CheckBox) findViewById(R.id.cbPrivateDrive);
 
         // bluetooth
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();

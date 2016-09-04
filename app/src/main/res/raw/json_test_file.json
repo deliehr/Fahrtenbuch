@@ -10,15 +10,6 @@
       "private_drive": true
     },
     {
-      "postal_code": "00000",
-      "locality": "to_delete",
-      "address": "to_delete",
-      "additional_info": "to_delete",
-      "latitude": 0.0,
-      "longitude": 0.0,
-      "private_drive": true
-    },
-    {
       "postal_code": "33102",
       "locality": "Paderborn",
       "address": "Fürstenallee 9",

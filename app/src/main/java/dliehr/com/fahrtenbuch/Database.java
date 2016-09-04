@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
+import android.provider.ContactsContract;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -416,6 +417,34 @@ public class Database {
 
 
     }
+
+    public FahrtItem getLastDrive() {
+        FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        FahrtItem returnFahrtItem = new FahrtItem();
+        Cursor cursor = null;
+
+        try {
+            cursor = db.rawQuery("SELECT * FROM " + T_FAHRT.TABLE_NAME + " WHERE _id = (SELECT MAX(" + T_FAHRT._ID + ") FROM " + T_FAHRT.TABLE_NAME + ")", null);
+
+            if(cursor.moveToFirst()) {
+                returnFahrtItem.setId(cursor.getInt(0));
+
+                returnFahrtItem.setStartFields(cursor.getString(1), cursor.getString(2), cursor.getString(3).split(",")[0].split(" ")[1], cursor.getString(3).split(",")[1].trim(), Double.valueOf(cursor.getString(5)), cursor.getDouble(6), cursor.getDouble(7), cursor.getString(8), cursor.getInt(9) == 1, cursor.getString(10));
+
+                returnFahrtItem.setEndFields(cursor.getString(11), cursor.getString(12), cursor.getString(13).split(",")[0].split(" ")[1], cursor.getString(13).split(",")[1], cursor.getDouble(15), cursor.getDouble(16), cursor.getDouble(17), cursor.getString(18), cursor.getInt(19) == 1, cursor.getString(20));
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+            returnFahrtItem = null;
+        } finally {
+            cursor.close();
+            db.close();
+        }
+
+        return returnFahrtItem;
+    }
     // endregion
 
     // region table t_poi
@@ -489,16 +518,16 @@ public class Database {
         FahrtenbuchDbHelper helper = new FahrtenbuchDbHelper(context);
         SQLiteDatabase db = helper.getReadableDatabase();
 
-        ArrayList<PointOfInterest> result = null;
+        List<PointOfInterest> result = null;
 
         try {
             result = new ArrayList<PointOfInterest>();
             Cursor c = db.query(T_POI.TABLE_NAME, new String[]{
                     T_POI._ID,
-                    T_POI.COL_ADDRESS,
-                    T_POI.COL_ADDITIONAL_INFO,
                     T_POI.COL_POSTAL_CODE,
                     T_POI.COL_LOCALITY,
+                    T_POI.COL_ADDRESS,
+                    T_POI.COL_ADDITIONAL_INFO,
                     T_POI.COL_LATITUDE,
                     T_POI.COL_LONGITUDE,
                     T_POI.COL_PRIVATE_DRIVE

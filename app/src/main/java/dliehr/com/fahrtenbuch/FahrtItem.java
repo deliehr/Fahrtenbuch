@@ -4,6 +4,7 @@ package dliehr.com.fahrtenbuch;
  * Created by Dominik on 24.08.16.
  */
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class FahrtItem {
     private int id = 0;
@@ -125,6 +126,25 @@ public class FahrtItem {
         fields.add(this.end_car); // text 20
 
         return fields;
+    }
+
+    public String getFormatedStringForServer() {
+        StringBuilder result = new StringBuilder();
+
+        result.append(this.getId());
+        result.append(";");
+
+        for(Object o : this.getStartFields()) {
+            result.append((String) o);
+            result.append(";");
+        }
+
+        for(Object o : this.getEndFields()) {
+            result.append((String) o);
+            result.append(";");
+        }
+
+        return result.toString();
     }
 
     public String getStartDate() { return this.start_date; }

@@ -162,22 +162,9 @@ public class PointOfInterest {
     // region class methods
     public static Boolean removePoi(Context context, int index) {
         try {
-            JSONObject jsonFile = new JSONObject(getJSONContent(context));
-
-            if(jsonFile.has("points")) {
-                JSONArray points = jsonFile.getJSONArray("points");
-                int countBeforeDelete = points.length();
-
-                points.remove(1);
-
-                if(points.length() < countBeforeDelete) {
-                    // successfully deleted
-                    // save new json_file
-
-                }
+            if(Database.getInstance(context).removePoiFromT_POI(index)) {
+                return true;
             }
-        } catch (JSONException jsoe) {
-            Log.e(TAG, jsoe.getMessage());
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
