@@ -240,6 +240,7 @@ public class activityStart extends AppCompatActivity {
                 currentAddress = retrieveAddress.getAddress();
             } else {
                 Log.i(TAG, "take address from cache");
+                //Toast.makeText(context, "Taken address from cache!", Toast.LENGTH_SHORT).show();
             }
 
             if(currentAddress != null) {
@@ -573,12 +574,6 @@ public class activityStart extends AppCompatActivity {
         this.sendLastRowToServer();
     }
 
-    // debug
-    public void btnClickTest(View view) {
-        // debug
-        this.sendLastRowToServer();
-    }
-
     private void sendLastRowToServer() {
         FahrtItem lastDrive = Database.getInstance(this).getLastDrive();
 
@@ -853,6 +848,9 @@ public class activityStart extends AppCompatActivity {
 
         // bluetooth thread
         //this.startBluetoothThread();
+
+        // debug
+        this.sendLastRowToServer();
     }
 
     @Override

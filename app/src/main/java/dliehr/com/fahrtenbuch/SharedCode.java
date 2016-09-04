@@ -13,12 +13,21 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by Dominik on 23.08.16.
@@ -101,5 +110,53 @@ public class SharedCode {
 
 
         return returnValue;
+    }
+
+    private static final char PARAMETER_DELIMITER = '&';
+    private static final char PARAMETER_EQUALS_CHAR = '=';
+    public static String createQueryStringForParameters(Map<String, String> parameters) {
+        StringBuilder parametersAsQueryString = new StringBuilder();
+        if (parameters != null) {
+            boolean firstParameter = true;
+
+            for (String parameterName : parameters.keySet()) {
+                if (!firstParameter) {
+                    parametersAsQueryString.append(PARAMETER_DELIMITER);
+                }
+
+                parametersAsQueryString.append(parameterName)
+                        .append(PARAMETER_EQUALS_CHAR)
+                        .append(URLEncoder.encode(
+                                parameters.get(parameterName)));
+
+                firstParameter = false;
+            }
+        }
+        return parametersAsQueryString.toString();
+    }
+
+    public static String getPostDataString(JSONObject params) throws Exception {
+
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+
+        Iterator<String> itr = params.keys();
+
+        while(itr.hasNext()){
+
+            String key= itr.next();
+            Object value = params.get(key);
+
+            if (first)
+                first = false;
+            else
+                result.append("&");
+
+            result.append(URLEncoder.encode(key, "UTF-8"));
+            result.append("=");
+            result.append(URLEncoder.encode(value.toString(), "UTF-8"));
+
+        }
+        return result.toString();
     }
 }
