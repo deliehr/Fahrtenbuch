@@ -97,6 +97,9 @@ public class activityPOIs extends AppCompatActivity {
             // remove poi
             if(PointOfInterest.removePoi(this, mSelectedPosition)) {
                 Toast.makeText(this, "POI gelöscht!", Toast.LENGTH_SHORT).show();
+
+                // reload
+                this.fillListView();
             } else {
                 Toast.makeText(this, "Fehler, POI konnte nicht gelöscht werden", Toast.LENGTH_SHORT).show();
             }

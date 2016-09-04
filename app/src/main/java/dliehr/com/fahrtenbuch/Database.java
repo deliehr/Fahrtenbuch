@@ -501,7 +501,8 @@ public class Database {
         SQLiteDatabase db = helper.getReadableDatabase();
 
         try {
-            String sql = "REMOVE FROM " + T_POI.TABLE_NAME + " WHERE " + T_POI._ID + " = " + index;
+            String sql = "DELETE FROM " + T_POI.TABLE_NAME + " WHERE " + T_POI._ID + " = " + (index + 1);
+            Log.i(TAG, sql);
             db.execSQL(sql);
 
             success = true;
