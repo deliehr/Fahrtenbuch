@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Location;
 import android.os.*;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -20,18 +21,7 @@ import com.github.pires.obd.commands.engine.*;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.*;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
-
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -62,8 +52,6 @@ public class activityStart extends AppCompatActivity {
         @Override
         public void onLocationChanged(Location location) {
             mLocation = location;
-
-            Log.i(TAG, "Location changed (onLocationChanged)");
 
             updateAddressField();
             updateLocationText();
@@ -196,7 +184,7 @@ public class activityStart extends AppCompatActivity {
                 Log.d("warning", Errors.warning_checking_on_start_for_existing_drive.getErrorText());
             }
         } catch(Exception exc) {
-            Log.d("error", "error: " + exc.getMessage());
+            Log.e(TAG, "error: " + exc.getMessage());
         }
     }
 
@@ -239,8 +227,6 @@ public class activityStart extends AppCompatActivity {
                 retrieveAddress.waitForTaskFinish();
                 currentAddress = retrieveAddress.getAddress();
             } else {
-                Log.i(TAG, "take address from cache");
-                //Toast.makeText(context, "Taken address from cache!", Toast.LENGTH_SHORT).show();
             }
 
             if(currentAddress != null) {
@@ -248,7 +234,6 @@ public class activityStart extends AppCompatActivity {
                     String placeAddressToSet = currentAddress.getPostalCode()
                             + " " + currentAddress.getLocality() +
                             ", " + currentAddress.getAddressLine(0);
-                    Log.i(TAG, placeAddressToSet);
 
                     etPlaceAddress.setText(placeAddressToSet);
                 } catch (Exception e) {
@@ -275,14 +260,12 @@ public class activityStart extends AppCompatActivity {
                     retrieveAddress.waitForTaskFinish();
                     currentAddress = retrieveAddress.getAddress();
                 } else {
-                    Log.i(TAG, "take address from cache");
                 }
             }
 
             // set text
             if(currentAddress != null) {
                 try {
-                    Log.i(TAG, mPoiFromFoundAddress.getAdditionalInfo());
                     etAdditionalInfo.setText(mPoiFromFoundAddress.getAdditionalInfo());
                 } catch (Exception e) {
                     Log.e(TAG, e.getMessage());
@@ -376,7 +359,7 @@ public class activityStart extends AppCompatActivity {
                 Log.d("warning", Errors.could_not_load_last_drive.getErrorText());
             }
         } catch (Exception exc) {
-            Log.d("error", "error: " + exc.getMessage());
+            Log.e(TAG, "error: " + exc.getMessage());
         }
     }
 
@@ -391,8 +374,6 @@ public class activityStart extends AppCompatActivity {
             // get client
             mGoogleApiClient = googleApiClientBuilder.build();
 
-            Log.i(TAG, "Google play services version = " + String.valueOf(context.getPackageManager().getPackageInfo("com.google.android.gms", 0).versionCode));
-
             // location request
             mLocationRequest = new LocationRequest();
             mLocationRequest.setInterval(UPDATE_INTERVAL);
@@ -400,7 +381,6 @@ public class activityStart extends AppCompatActivity {
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
             mGoogleApiClient.connect();
-            Log.i("info", "google api client connected");
 
             mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, mLocationListener);
@@ -448,21 +428,43 @@ public class activityStart extends AppCompatActivity {
                 // make entry in the db
                 FahrtItem tmpItem = new FahrtItem();
 
-                // date
-                SimpleDateFormat currentDate = new SimpleDateFormat("yyyy-MM-dd");
-                SimpleDateFormat currentTime = new SimpleDateFormat("HH:mm:ss");
-
-                // town & adress
+                // set up data
                 try {
+                    // date
+                    SimpleDateFormat currentDate = new SimpleDateFormat("yyyy-MM-dd");
+                    SimpleDateFormat currentTime = new SimpleDateFormat("HH:mm:ss");
+
+                    // town / locality
+                    String locality = "";
+
+                    try {
+                        locality = etPlaceAddress.getText().toString().split(",")[0].split(" ")[1];
+                    } catch (Exception e) {
+                        Log.e(TAG, e.getMessage());
+                    }
+
+                    String addressLine = "";
+
+                    try {
+                        addressLine = etPlaceAddress.getText().toString().split(",")[1].trim();
+                    } catch (Exception e) {
+                        Log.e(TAG, e.getMessage());
+                    }
+
+                    // additional info
                     String additionalInfo = ((EditText) findViewById(R.id.etAdditionalInfo)).getText().toString();
+
+                    // private drive
                     Boolean privateDrive = ((CheckBox) findViewById(R.id.cbPrivateDrive)).isChecked();
+
+                    // car
                     String car = ((EditText) findViewById(R.id.etCar)).getText().toString();
 
                     tmpItem.setStartFields(
                             currentDate.format(new Date()),
                             currentTime.format(new Date()),
-                            "start town",
-                            "address",
+                            locality,
+                            addressLine,
                             Double.valueOf(kmstand),
                             mLocation.getLatitude(),
                             mLocation.getLongitude(),
@@ -485,7 +487,7 @@ public class activityStart extends AppCompatActivity {
                     this.hideSoftwareKeyboard(view);
                     this.driveStarted = true;
                     this.driveEnded = false;
-                    this.lastKmstand = Integer.valueOf(kmstand);
+                    this.lastKmstand = Double.valueOf(kmstand);
                 } catch (Exception exc) {
                     Log.d("error", Errors.inserting_fahrtitem_not_possible + " (" + exc.getMessage() + ")");
                 }
@@ -517,38 +519,46 @@ public class activityStart extends AppCompatActivity {
                 FahrtItem lastDriveItem = resultItems.get(maxId);
 
                 // end drive
-
-                // date
-                SimpleDateFormat currentDate = new SimpleDateFormat("yyyy-MM-dd");
-                SimpleDateFormat currentTime = new SimpleDateFormat("HH:mm:ss");
-
-                // town & adress
-                /*
-                RetrieveAddress retrieveAddress = new RetrieveAddress(mLocation);
-                retrieveAddress.execute(mLocation);
-                retrieveAddress.waitForTaskFinish();
-                Address currentAddress = retrieveAddress.getAddress();
-                String address = "";
-                String town = "";
-
-                if(currentAddress != null) {
-                    address = currentAddress.getAddressLine(0);
-                    town = currentAddress.getPostalCode() + "," + currentAddress.getLocality();
-                } else {
-                    Log.d("error", "void btnClickStartDrive(): currentAddress is null");
-                }
-                */
-
-                String ortszusatz = ((EditText) findViewById(R.id.etAdditionalInfo)).getText().toString();
-                Boolean privateFahrt = ((CheckBox) findViewById(R.id.cbPrivateDrive)).isChecked();
-                String car = ((EditText) findViewById(R.id.etCar)).getText().toString();
-
                 try {
                     // update item and db
-                    //lastDriveItem.setEndFields(currentDate.format(new Date()), currentTime.format(new Date()), town, address, Double.valueOf(kmstand));
-                    //lastDriveItem.setEndFields(currentDate.format(new Date()), currentTime.format(new Date()), town, address, Double.valueOf(kmstand), mLocation.getLatitude(), mLocation.getLongitude(), ortszusatz, privateFahrt, car);
-                    lastDriveItem.setEndFields(currentDate.format(new Date()), currentTime.format(new Date()), ((EditText) findViewById(R.id.etPlaceAddress)).getText().toString(), ((EditText) findViewById(R.id.etAdditionalInfo)).getText().toString(), Double.valueOf(kmstand), mLocation.getLatitude(), mLocation.getLongitude(), ortszusatz, privateFahrt, car);
-                    //long returnId = Database.getInstance(this).updateRowWithId(lastDriveItem.getId(), lastDriveItem);
+                    // set up data
+
+                    // date
+                    SimpleDateFormat currentDate = new SimpleDateFormat("yyyy-MM-dd");
+                    SimpleDateFormat currentTime = new SimpleDateFormat("HH:mm:ss");
+
+                    // town / locality
+                    String locality = "";
+                    try {
+                        locality = etPlaceAddress.getText().toString().split(",")[0].split(" ")[1];
+                    } catch (Exception e) {
+                        Log.e(TAG, e.getMessage());
+                    }
+
+                    String addressLine = "";
+                    try {
+                        addressLine = etPlaceAddress.getText().toString().split(",")[1].trim();
+                    } catch (Exception e) {
+                        Log.e(TAG, e.getMessage());
+                    }
+
+                    String additionalInfo = etAdditionalInfo.getText().toString();
+                    Boolean privateDrive = cbPrivateDrive.isChecked();
+                    String car = ((EditText) findViewById(R.id.etCar)).getText().toString();
+
+                    lastDriveItem.setEndFields(
+                            currentDate.format(new Date()),
+                            currentTime.format(new Date()),
+                            locality,
+                            addressLine,
+                            Double.valueOf(kmstand),
+                            mLocation.getLatitude(),
+                            mLocation.getLongitude(),
+                            additionalInfo,
+                            privateDrive,
+                            car
+                    );
+
                     long returnId = Database.getInstance(this).updateRowWithIdFromTableT_FAHRT(lastDriveItem.getId(), lastDriveItem);
                     Toast.makeText(activityStart.this, "Fahrt beendet ...", Toast.LENGTH_LONG).show();
 
@@ -559,7 +569,7 @@ public class activityStart extends AppCompatActivity {
                     //
                     this.driveEnded = true;
                     this.driveStarted = false;
-                    this.lastKmstand = Integer.valueOf(kmstand);
+                    this.lastKmstand = Double.valueOf(kmstand);
                 } catch (Exception exc) {
                     Log.d("error", Errors.updating_table_t_fahrt + ": " + exc.getMessage());
                 }
@@ -571,20 +581,23 @@ public class activityStart extends AppCompatActivity {
         }
 
         // send last drive to webserver
-        this.sendLastRowToServer();
+        if(this.sendLastRowToServer()) {
+            Toast.makeText(this, "Daten hochgeladen", Toast.LENGTH_SHORT).show();
+        }
     }
 
-    private void sendLastRowToServer() {
-        FahrtItem lastDrive = Database.getInstance(this).getLastDrive();
-
-        SendDriveToServer send = new SendDriveToServer(lastDrive);
+    private Boolean sendLastRowToServer() {
+        SendDriveToServer send = new SendDriveToServer(this);
         send.execute();
+        send.waitForTaskFinish();
 
-        if(send.isBackgroundJobDone()) {
-            Log.i(TAG, "erfolg");
-        } else {
-            Log.i(TAG, "fehler");
+        Boolean returnValue = false;
+
+        if(send.getResult().matches("true")) {
+            returnValue = true;
         }
+
+        return returnValue;
     }
 
     public void btnClickAddPoi(View view) {
@@ -848,9 +861,6 @@ public class activityStart extends AppCompatActivity {
 
         // bluetooth thread
         //this.startBluetoothThread();
-
-        // debug
-        this.sendLastRowToServer();
     }
 
     @Override

@@ -3,10 +3,15 @@ package dliehr.com.fahrtenbuch;
 /**
  * Created by Dominik on 24.08.16.
  */
+import android.util.Log;
+
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class FahrtItem {
+    private static final String TAG = FahrtItem.class.getSimpleName();
+
     private int id = 0;
 
     private String start_date = null;
@@ -131,20 +136,24 @@ public class FahrtItem {
     public String getFormatedStringForServer() {
         StringBuilder result = new StringBuilder();
 
-        result.append(this.getId());
-        result.append(";");
-
-        for(Object o : this.getStartFields()) {
-            result.append((String) o);
+        try {
+            result.append(this.getId());
             result.append(";");
+
+            for(Object o : this.getStartFields()) {
+                result.append(URLEncoder.encode(String.valueOf(o), "ISO-8859-1"));
+                result.append(";");
+            }
+
+            for(Object o : this.getEndFields()) {
+                result.append(URLEncoder.encode(String.valueOf(o), "ISO-8859-1"));
+                result.append(";");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
         }
 
-        for(Object o : this.getEndFields()) {
-            result.append((String) o);
-            result.append(";");
-        }
-
-        return result.toString();
+        return result.toString().substring(0, result.length()-1);
     }
 
     public String getStartDate() { return this.start_date; }

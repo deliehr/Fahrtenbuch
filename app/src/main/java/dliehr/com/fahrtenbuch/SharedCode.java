@@ -13,6 +13,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -22,6 +27,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
@@ -33,6 +39,7 @@ import java.util.Map;
  * Created by Dominik on 23.08.16.
  */
 public class SharedCode {
+    private static final String TAG = SharedCode.class.getSimpleName();
     public static File createDatabaseBackup(Context context) {
         try {
             // copy db
@@ -135,28 +142,20 @@ public class SharedCode {
         return parametersAsQueryString.toString();
     }
 
-    public static String getPostDataString(JSONObject params) throws Exception {
+    public static String sendHttpGetRequest(String url) {
+        String serverResponse = "";
 
-        StringBuilder result = new StringBuilder();
-        boolean first = true;
-
-        Iterator<String> itr = params.keys();
-
-        while(itr.hasNext()){
-
-            String key= itr.next();
-            Object value = params.get(key);
-
-            if (first)
-                first = false;
-            else
-                result.append("&");
-
-            result.append(URLEncoder.encode(key, "UTF-8"));
-            result.append("=");
-            result.append(URLEncoder.encode(value.toString(), "UTF-8"));
-
+        try {
+            HttpClient client = new DefaultHttpClient();
+            HttpGet httpGetRequest = new HttpGet(url);
+            ResponseHandler<String> responseHandler = new BasicResponseHandler();
+            serverResponse = client.execute(httpGetRequest, responseHandler);
+        } catch (UnsupportedEncodingException uee) {
+            Log.e(TAG, uee.getMessage());
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
         }
-        return result.toString();
+
+        return serverResponse;
     }
 }

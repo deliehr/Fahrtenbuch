@@ -137,9 +137,10 @@ public class PointOfInterest {
     public static List<PointOfInterest> getPoints(Context context) {
         // check if table t_poi exists
         try {
-            Database.getInstance(context).createTableT_POI();
+            // TODO: class PointOfInterest method getPoints, check if table exists
+            //Database.getInstance(context).createTableT_POI();
         } catch (Exception e) {
-
+            Log.e(TAG, e.getMessage());
         }
 
         // check if table empty

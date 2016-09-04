@@ -426,14 +426,49 @@ public class Database {
         Cursor cursor = null;
 
         try {
-            cursor = db.rawQuery("SELECT * FROM " + T_FAHRT.TABLE_NAME + " WHERE _id = (SELECT MAX(" + T_FAHRT._ID + ") FROM " + T_FAHRT.TABLE_NAME + ")", null);
+            // TODO: class Database: split array gibt nicht immer items zurück (andere Felder noch überprüfen)
+            String sql = "SELECT * FROM " + T_FAHRT.TABLE_NAME + " WHERE _id = (SELECT MAX(" + T_FAHRT._ID + ") FROM " + T_FAHRT.TABLE_NAME + ")";
+            Log.i(TAG, sql);
+            cursor = db.rawQuery(sql, null);
 
             if(cursor.moveToFirst()) {
                 returnFahrtItem.setId(cursor.getInt(0));
 
-                returnFahrtItem.setStartFields(cursor.getString(1), cursor.getString(2), cursor.getString(3).split(",")[0].split(" ")[1], cursor.getString(3).split(",")[1].trim(), Double.valueOf(cursor.getString(5)), cursor.getDouble(6), cursor.getDouble(7), cursor.getString(8), cursor.getInt(9) == 1, cursor.getString(10));
+                // check column 3, locality / town
+                String startLocality = "";
+                try {
+                    startLocality = cursor.getString(3).split(",")[0].split(" ")[1];
+                } catch (Exception e) {
+                    Log.e(TAG, e.getMessage());
+                }
 
-                returnFahrtItem.setEndFields(cursor.getString(11), cursor.getString(12), cursor.getString(13).split(",")[0].split(" ")[1], cursor.getString(13).split(",")[1], cursor.getDouble(15), cursor.getDouble(16), cursor.getDouble(17), cursor.getString(18), cursor.getInt(19) == 1, cursor.getString(20));
+                // check column 4, address line / address
+                String startAddressLine = "";
+                try {
+                    startAddressLine = cursor.getString(3).split(",")[1].trim();
+                } catch (Exception e) {
+                    Log.e(TAG, e.getMessage());
+                }
+
+                returnFahrtItem.setStartFields(cursor.getString(1), cursor.getString(2), startLocality, startAddressLine, Double.valueOf(cursor.getString(5)), cursor.getDouble(6), cursor.getDouble(7), cursor.getString(8), cursor.getInt(9) == 1, cursor.getString(10));
+
+                // check column 13, locality / town
+                String endLocality = "";
+                try {
+                    endLocality = cursor.getString(13).split(",")[0].split(" ")[1];
+                } catch (Exception e) {
+                    Log.e(TAG, e.getMessage());
+                }
+
+                // check column 14, address line / address
+                String endAddressLine = "";
+                try {
+                    endAddressLine = cursor.getString(13).split(",")[1];
+                } catch (Exception e) {
+                    Log.e(TAG, e.getMessage());
+                }
+
+                returnFahrtItem.setEndFields(cursor.getString(11), cursor.getString(12), endLocality, endAddressLine, cursor.getDouble(15), cursor.getDouble(16), cursor.getDouble(17), cursor.getString(18), cursor.getInt(19) == 1, cursor.getString(20));
             }
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
@@ -534,24 +569,20 @@ public class Database {
                     T_POI.COL_PRIVATE_DRIVE
             }, null, null, null, null, null);
 
-            try {
-                while(c.moveToNext()) {
-                    PointOfInterest tmpItem = new PointOfInterest();
-                    tmpItem.setPostalCode(c.getString(1));
-                    tmpItem.setLocality(c.getString(2));
-                    tmpItem.setAddressLine(c.getString(3));
-                    tmpItem.setAdditionalInfo(c.getString(4));
-                    tmpItem.setLatitude(c.getDouble(5));
-                    tmpItem.setLongitude(c.getDouble(6));
-                    tmpItem.setPrivateDrive((c.getInt(7)) == 1);
+            while(c.moveToNext()) {
+                PointOfInterest tmpItem = new PointOfInterest();
+                tmpItem.setPostalCode(c.getString(1));
+                tmpItem.setLocality(c.getString(2));
+                tmpItem.setAddressLine(c.getString(3));
+                tmpItem.setAdditionalInfo(c.getString(4));
+                tmpItem.setLatitude(c.getDouble(5));
+                tmpItem.setLongitude(c.getDouble(6));
+                tmpItem.setPrivateDrive((c.getInt(7)) == 1);
 
-                    result.add(tmpItem);
-                }
-            } catch (Exception e) {
-                result = null;
-            } finally {
-                c.close();
+                result.add(tmpItem);
             }
+
+            c.close();
         }catch (Exception e) {
             result = null;
         } finally {
