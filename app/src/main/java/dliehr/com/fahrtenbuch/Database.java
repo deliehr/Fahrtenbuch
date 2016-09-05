@@ -465,7 +465,8 @@ public class Database {
                 // check column 14, address line / address
                 String endAddressLine = "";
                 try {
-                    endAddressLine = cursor.getString(13).split(",")[1];
+                    //endAddressLine = cursor.getString(13).split(",")[1];
+                    endAddressLine = cursor.getString(14);
                 } catch (Exception e) {
                     Log.e(TAG, e.getMessage());
                 }
