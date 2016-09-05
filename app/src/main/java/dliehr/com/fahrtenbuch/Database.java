@@ -437,7 +437,8 @@ public class Database {
                 // check column 3, locality / town
                 String startLocality = "";
                 try {
-                    startLocality = cursor.getString(3).split(",")[0].split(" ")[1];
+                    startLocality = cursor.getString(3);
+                    //startLocality = cursor.getString(3).split(",")[0].split(" ")[1];
                 } catch (Exception e) {
                     Log.e(TAG, e.getMessage());
                 }
@@ -445,7 +446,7 @@ public class Database {
                 // check column 4, address line / address
                 String startAddressLine = "";
                 try {
-                    startAddressLine = cursor.getString(3).split(",")[1].trim();
+                    startAddressLine = cursor.getString(4).trim();
                 } catch (Exception e) {
                     Log.e(TAG, e.getMessage());
                 }
@@ -455,7 +456,8 @@ public class Database {
                 // check column 13, locality / town
                 String endLocality = "";
                 try {
-                    endLocality = cursor.getString(13).split(",")[0].split(" ")[1];
+                    //endLocality = cursor.getString(13).split(",")[0].split(" ")[1];
+                    endLocality = cursor.getString(13);
                 } catch (Exception e) {
                     Log.e(TAG, e.getMessage());
                 }

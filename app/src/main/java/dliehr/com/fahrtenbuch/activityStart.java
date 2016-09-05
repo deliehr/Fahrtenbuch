@@ -435,10 +435,9 @@ public class activityStart extends AppCompatActivity {
                     SimpleDateFormat currentTime = new SimpleDateFormat("HH:mm:ss");
 
                     // town / locality
-                    String locality = "";
-
+                    String placeAddress = "";
                     try {
-                        locality = etPlaceAddress.getText().toString().split(",")[0].split(" ")[1];
+                        placeAddress = etPlaceAddress.getText().toString().split(",")[0].split(" ")[0] + "," + etPlaceAddress.getText().toString().split(",")[0].split(" ")[1];
                     } catch (Exception e) {
                         Log.e(TAG, e.getMessage());
                     }
@@ -463,7 +462,7 @@ public class activityStart extends AppCompatActivity {
                     tmpItem.setStartFields(
                             currentDate.format(new Date()),
                             currentTime.format(new Date()),
-                            locality,
+                            placeAddress,
                             addressLine,
                             Double.valueOf(kmstand),
                             mLocation.getLatitude(),
@@ -483,7 +482,7 @@ public class activityStart extends AppCompatActivity {
 
                     Log.d("info", "return number = " + Long.toString(returnNumber));
 
-                    Toast.makeText(activityStart.this, "Fahrt gestartet ...", Toast.LENGTH_LONG).show();
+                    Toast.makeText(activityStart.this, "Fahrt gestartet.", Toast.LENGTH_SHORT).show();
                     this.hideSoftwareKeyboard(view);
                     this.driveStarted = true;
                     this.driveEnded = false;
@@ -528,9 +527,9 @@ public class activityStart extends AppCompatActivity {
                     SimpleDateFormat currentTime = new SimpleDateFormat("HH:mm:ss");
 
                     // town / locality
-                    String locality = "";
+                    String placeAddress = "";
                     try {
-                        locality = etPlaceAddress.getText().toString().split(",")[0].split(" ")[1];
+                        placeAddress = etPlaceAddress.getText().toString().split(",")[0].split(" ")[0] + "," + etPlaceAddress.getText().toString().split(",")[0].split(" ")[1];
                     } catch (Exception e) {
                         Log.e(TAG, e.getMessage());
                     }
@@ -549,7 +548,7 @@ public class activityStart extends AppCompatActivity {
                     lastDriveItem.setEndFields(
                             currentDate.format(new Date()),
                             currentTime.format(new Date()),
-                            locality,
+                            placeAddress,
                             addressLine,
                             Double.valueOf(kmstand),
                             mLocation.getLatitude(),
@@ -560,7 +559,7 @@ public class activityStart extends AppCompatActivity {
                     );
 
                     long returnId = Database.getInstance(this).updateRowWithIdFromTableT_FAHRT(lastDriveItem.getId(), lastDriveItem);
-                    Toast.makeText(activityStart.this, "Fahrt beendet ...", Toast.LENGTH_LONG).show();
+                    Toast.makeText(activityStart.this, "Fahrt beendet.", Toast.LENGTH_SHORT).show();
 
                     // disable / enable button
                     ((Button) findViewById(R.id.btnEndDrive)).setEnabled(false);
@@ -582,7 +581,7 @@ public class activityStart extends AppCompatActivity {
 
         // send last drive to webserver
         if(this.sendLastRowToServer()) {
-            Toast.makeText(this, "Daten hochgeladen", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Fahrt auf Server übertragen", Toast.LENGTH_SHORT).show();
         }
     }
 

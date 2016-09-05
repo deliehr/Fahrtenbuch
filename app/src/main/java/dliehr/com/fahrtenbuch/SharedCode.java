@@ -146,8 +146,10 @@ public class SharedCode {
         String serverResponse = "";
 
         try {
+            // TODO url encoding vornehmen. ABER: scheint Parameterstruktur zu zerstören
             HttpClient client = new DefaultHttpClient();
             HttpGet httpGetRequest = new HttpGet(url);
+            //HttpGet httpGetRequest = new HttpGet(URLEncoder.encode(url, "ISO-8859-1"));
             ResponseHandler<String> responseHandler = new BasicResponseHandler();
             serverResponse = client.execute(httpGetRequest, responseHandler);
         } catch (UnsupportedEncodingException uee) {
