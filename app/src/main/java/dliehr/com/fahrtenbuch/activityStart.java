@@ -14,8 +14,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.content.*;
 import android.util.Log;
-import android.view.*;
+
 import android.view.inputmethod.InputMethodManager;
+import android.view.*;
 import android.widget.*;
 import com.github.pires.obd.commands.engine.*;
 import com.google.android.gms.common.ConnectionResult;
@@ -943,6 +944,9 @@ public class activityStart extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
+
+
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
 
