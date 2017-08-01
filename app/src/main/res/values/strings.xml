@@ -1,6 +1,0 @@
-<resources>
-    <string name="app_name">Fahrtenbuch</string>
-    <string name="location_info">Location:</string>
-    <string name="bluetooth_info">Bluetooth:</string>
-    <string name="btnStartDrive">Starte Fahrt</string>
-</resources>
