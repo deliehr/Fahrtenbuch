@@ -9,3 +9,8 @@ Die Fahrten können im Anschluss an eine Email-Adresse versendet werden.
 
 Min SDK-Version: 15
 Target SDK-Version: 15
+
+# Screenshots
+
+![emulator 1](/_projectdata/screenshots/emulator1.png?raw=true "Emulator 1")
+![emulator 2](/_projectdata/screenshots/emulator2.png?raw=true "Emulator 2")
