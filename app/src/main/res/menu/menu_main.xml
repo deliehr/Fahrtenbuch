@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:androclass="http://schemas.android.com/apk/res/android">
+
+    <item androclass:id="@+id/menuStart" androclass:title="@string/menuItemStart" />
+    <item androclass:id="@+id/menuConfig" androclass:title="@string/menuItemConfig" />
+    <item androclass:id="@+id/menuDatabase" androclass:title="@string/menuItemDatabase" />
+</menu>

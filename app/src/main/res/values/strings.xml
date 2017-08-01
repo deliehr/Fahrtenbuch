@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- app and activities -->
+    <string name="app_name">Driver\'s logbook</string>
+    <string name="activityTitleConfig">Configuration</string>
+
+    <!-- activity start -->
+    <string name="activityMainStartButtonStartTrip">Start trip</string>
+    <string name="activityMainStartDescription">Description</string>
+    <string name="activityMainStartTimeOfDay">Time of day</string>
+    <string name="activityMainStartAddress">Address</string>
+    <string name="activityMainUseAutoAddress">Auto</string>
+    <string name="activityMainStartPlace">Place</string>
+    <string name="activityMainStartMileage">Mileage</string>
+    <string name="activityMainStartCar">Car</string>
+    <string name="activityMainStartPrivateTrip">Private trip</string>
+    <string name="activityMainStartDriver">Driver</string>
+    <string name="activityMain.Message.LocationManagerNotAvailable">GPS services not available</string>
+    <string name="activityMain.Message.GPSProviderNotEnabled">GPS services not available (permission denied?)</string>
+    <string name="activityMain.Message.NoAddressFound">No address found</string>
+    <string name="activityMain.Message.TripStarted">Trip started</string>
+    <string name="activityMain.Message.TripNotStarted">Trip not started, error</string>
+    <string name="activityMain.Label.TraveledDistance">Distance</string>
+    <string name="activityMainStartButtonEndTrip">End trip</string>
+    <string name="activityMain.Message.TripEnded">Trip ended</string>
+    <string name="activityMain.Message.TripNotEnded">Error, trip not ended successfully</string>
+    <string name="activityMain.Button.SaveTrip">Save trip</string>
+    <string name="activityMain.Label.TravelSpeed">Speed</string>
+
+    <!-- activity config -->
+    <string name="activityConfigTitleDriver">Driver</string>
+    <string name="activityConfigLabelNewDriver">New driver</string>
+    <string name="activityConfigLabelFirstName">First name</string>
+    <string name="activityConfigLabelLastName">Last name</string>
+    <string name="activityConfigButtonInsertNewDriver">Insert</string>
+    <string name="activityConfigLabelDriverList">List of drivers</string>
+    <string name="activityConfigMessageInsertNames">Please specify a first and a last name</string>
+    <string name="activityConfigMessageNewDriverInserted">Driver inserted</string>
+    <string name="activityConfigMessageNewDriverInsertedFailed">Failed to insert driver</string>
+    <string name="activityConfigMessageDriverDeleted">Driver deleted</string>
+    <string name="activityConfigMessageDriverDeleteFailed">Failed to delete driver</string>
+    <string name="activityConfig.Title.Cars">Cars</string>
+    <string name="activityConfig.Label.NewCar">New car</string>
+    <string name="activityConfig.Label.Model">Model</string>
+    <string name="activityConfig.Label.Mileage">Mileage</string>
+    <string name="activityConfig.Button.InsertNewCar">Insert</string>
+    <string name="activityConfig.Message.InsertNames">Please specify a model and mileage</string>
+    <string name="activityConfig.Message.NewCarInserted">Car inserted</string>
+    <string name="activityConfig.Message.NewCarInsertFailed">Failed to insert car</string>
+    <string name="activityConfig.Message.CarDeleted">Car deleted</string>
+    <string name="activityConfig.Message.CarDeleteFailed">Failed to delete car</string>
+
+    <!-- menu -->
+    <string name="menuItemStart">Start</string>
+    <string name="menuItemConfig">Configuration</string>
+    <string name="menuItemDatabase">Database</string>
+</resources>
