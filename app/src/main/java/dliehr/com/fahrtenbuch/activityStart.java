@@ -27,8 +27,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 // google geolocation api key
-// name: server_key_fahrtenbuch
-// key: AIzaSyDFfDvQ-h8XaY3ZqDgooEOW38Aj9oEAf5Q
+// name: androidApp
+// key: AIzaSyAXmHMgXAxcA62ZHztzoUs5AHlOtTwxVzI
 
 // from another mac os systems :-)
 
@@ -85,13 +85,13 @@ public class activityStart extends AppCompatActivity {
     private static GoogleApiClient.OnConnectionFailedListener mOnConnectionFailedListener = new GoogleApiClient.OnConnectionFailedListener() {
         @Override
         public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-            Log.e(TAG, "OnConnectionFailedListener, connection failed");
+            Log.e(TAG, "connection failed: " + connectionResult.getErrorMessage());
         }
     };
 
     static final long UPDATE_INTERVAL = 1000;
     static final long FASTEST_UPDATE_INTERVAL = 500;
-    private static final String LOCATION_API_KEY = "AIzaSyDFfDvQ-h8XaY3ZqDgooEOW38Aj9oEAf5Q";
+    private static final String LOCATION_API_KEY = "AIzaSyAXmHMgXAxcA62ZHztzoUs5AHlOtTwxVzI";
 
     // static views
     static TextView tvLocation = null;
@@ -384,7 +384,7 @@ public class activityStart extends AppCompatActivity {
             mGoogleApiClient.connect();
 
             mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, mLocationListener);
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, mLocationListener, Looper.getMainLooper());
         } catch(SecurityException se) {
             Log.d("error", "security exception: " + Errors.gettings_gps_location_not_allowed + ": " + se.getMessage());
         }
@@ -835,7 +835,7 @@ public class activityStart extends AppCompatActivity {
         this.checkPermissions();
 
         // gps
-        this.startLocationThread();
+        //this.startLocationThread();
 
         // static views
         tvLocation = (TextView) findViewById(R.id.tvLocationInfo);
@@ -862,6 +862,8 @@ public class activityStart extends AppCompatActivity {
         // bluetooth thread
         //this.startBluetoothThread();
     }
+
+
 
     @Override
     public void onStop() {
@@ -933,6 +935,9 @@ public class activityStart extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
+
+        // gps
+        this.startLocationThread();
 
         // app lifetime cycle
         this.overrideVoidOnStartCalled = true;
